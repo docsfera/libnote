@@ -7,6 +7,9 @@ const Folders = () => {
             <p className="name-section">Папки</p>
             <p className="section-count">Всего 6 папок</p>
             <div className="folders">
+                <div className="folders-container">
+
+                </div>
                 <div className="folder">
                     <div className="folder-info">
                         <div className="folder-count">155</div>
@@ -16,13 +19,97 @@ const Folders = () => {
                             <div className="oval"> </div>
                         </div>
                     </div>
-                    <img src={`${process.env.PUBLIC_URL}/images/folder.svg`} alt="" className="folder-image"/>
+                    <div className="folder-image"> </div>
                     <p className="folder-name">Неотсортированные</p>
-
                 </div>
-                <div className="folder"></div>
-                <div className="folder"></div>
-                <div className="folder"></div>
+                <div className="folder">
+                    <div className="folder-info">
+                        <div className="folder-count">45</div>
+                        <div className="folder-settings">
+                            <div className="oval"> </div>
+                            <div className="oval"> </div>
+                            <div className="oval"> </div>
+                        </div>
+                    </div>
+                    <div className="folder-image"> </div>
+                    <p className="folder-name">Неотсортированные</p>
+                </div>
+                <div className="folder">
+                    <div className="folder-info">
+                        <div className="folder-count">8</div>
+                        <div className="folder-settings">
+                            <div className="oval"> </div>
+                            <div className="oval"> </div>
+                            <div className="oval"> </div>
+                        </div>
+                    </div>
+                    <div className="folder-image"> </div>
+                    <p className="folder-name">Неотсортированные</p>
+                </div>
+                <div className="folder">
+                    <div className="folder-info">
+                        <div className="folder-count">1</div>
+                        <div className="folder-settings">
+                            <div className="oval"> </div>
+                            <div className="oval"> </div>
+                            <div className="oval"> </div>
+                        </div>
+                    </div>
+                    <div className="folder-image"> </div>
+                    <p className="folder-name">Неотсортированные</p>
+                </div>
+
+                <div className="folder">
+                    <div className="folder-info">
+                        <div className="folder-count">1</div>
+                        <div className="folder-settings">
+                            <div className="oval"> </div>
+                            <div className="oval"> </div>
+                            <div className="oval"> </div>
+                        </div>
+                    </div>
+                    <div className="folder-image"> </div>
+                    <p className="folder-name">Неотсортированные</p>
+                </div>
+
+                <div className="folder">
+                    <div className="folder-info">
+                        <div className="folder-count">1</div>
+                        <div className="folder-settings">
+                            <div className="oval"> </div>
+                            <div className="oval"> </div>
+                            <div className="oval"> </div>
+                        </div>
+                    </div>
+                    <div className="folder-image"> </div>
+                    <p className="folder-name">Неотсортированные</p>
+                </div>
+
+                <div className="folder">
+                    <div className="folder-info">
+                        <div className="folder-count">1</div>
+                        <div className="folder-settings">
+                            <div className="oval"> </div>
+                            <div className="oval"> </div>
+                            <div className="oval"> </div>
+                        </div>
+                    </div>
+                    <div className="folder-image"> </div>
+                    <p className="folder-name">Неотсортированные</p>
+                </div>
+
+                <div className="folder">
+                    <div className="folder-info">
+                        <div className="folder-count">1</div>
+                        <div className="folder-settings">
+                            <div className="oval"> </div>
+                            <div className="oval"> </div>
+                            <div className="oval"> </div>
+                        </div>
+                    </div>
+                    <div className="folder-image"> </div>
+                    <p className="folder-name">Неотсортированные</p>
+                </div>
             </div>
         </div>
     );
