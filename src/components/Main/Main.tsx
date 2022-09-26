@@ -12,6 +12,8 @@ import React, {useEffect} from 'react';
 import "./Main.sass"
 import Header from "../Header/Header";
 import Folders from "../Folders/Folders"
+import NewBooks from "../NewBooks/NewBooks";
+import NewNotes from "../NewNotes/NewNotes";
 import LatestBooks from "../LatestBooks/LatestBooks";
 import InputNoteCreator from "../InputNoteCreator/InputNoteCreator";
 import Note from "../Note/Note";
@@ -55,14 +57,16 @@ const Main = () => {
         <div className="main">
             <Header/>
             <Folders/>
-            <LatestBooks/>
-            <InputNoteCreator refetch={refetch}/>
-            {!loading && data.getAllNotes.map((i:any) =>
-                <Note noteContent={i.content}
-                      noteDate={i.dateupdate}
-                      noteId = {i.id}
-                      deleteNoteEvent={deleteNoteEvent}/>)
-            }
+            <NewBooks/>
+            <NewNotes/>
+            {/*<LatestBooks/>*/}
+            {/*<InputNoteCreator refetch={refetch}/>*/}
+            {/*{!loading && data.getAllNotes.map((i:any) =>*/}
+            {/*    <Note noteContent={i.content}*/}
+            {/*          noteDate={i.dateupdate}*/}
+            {/*          noteId = {i.id}*/}
+            {/*          deleteNoteEvent={deleteNoteEvent}/>)*/}
+            {/*}*/}
         </div>
     );
 };
