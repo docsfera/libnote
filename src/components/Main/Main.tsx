@@ -20,18 +20,6 @@ import Note from "../Note/Note";
 import {useQuery, gql, useMutation} from '@apollo/client';
 
 
-
-const GET_ALL_NOTES = gql`
-    query getAllNotes($userid: ID) {
-        getAllNotes(userid: $userid){
-            id
-            content
-            dateupdate
-        }
-    }
-
-`
-
 const DELETE_NOTE_BY_ID = gql`
       mutation deleteNoteById($noteid: ID) {
         deleteNoteById(noteid: $noteid){
@@ -41,13 +29,8 @@ const DELETE_NOTE_BY_ID = gql`
     `;
 
 const Main = () => {
-    const { loading, data, error, refetch} = useQuery(GET_ALL_NOTES, {variables: {userid: "1"}})
-    const [deleteNote] = useMutation(DELETE_NOTE_BY_ID)
 
-    const deleteNoteEvent = async (noteId: string) => {
-        await deleteNote({variables: {noteid: noteId}} )
-        await refetch()
-    }
+
 
 
 

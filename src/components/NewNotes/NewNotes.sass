@@ -3,45 +3,30 @@
   font-family: Inter
   font-weight: 600
   color: white
+  .notes-wrapper
+    display: flex
+    justify-content: space-between
 
-  .name-section
-    font-size: 1.5em
-    margin-bottom: 4px
-  .section-count
-    font-size: 0.8em
-    opacity: 0.5
-    padding-bottom: 30px
-  .notes
-    .note
-
-      background: #282828
-      margin-bottom: 12px
-      padding: 21px 24px 21px 24px
+    .name-section
+      font-size: 1.5em
+      margin-bottom: 4px
+    .section-count
+      font-size: 0.8em
+      opacity: 0.5
+      padding-bottom: 30px
+    .create-note
+      display: flex
+      justify-content: center
+      align-items: center
+      height: 45px
+      width: 220px
+      background: #333333
       border-radius: 5px
-      box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.35)
-      .note-info
-        display: flex
-        justify-content: space-between
-        margin-bottom: 8px
-        .note-name
-          font-size: 18px //TODO: em!
-        .note-book
-          font-weight: 300
-          font-size: 11px // TODO: em!
-      .note-content
-        opacity: 0.7
-        font-family: Roboto
-        font-size: 14px // TODO: em!
-        font-weight: 300
-        line-height: 21px // TODO:em!
-        margin-bottom: 10px
-      .note-time
-        color: #828282
-        //font-family: Lato // TODO: lato?
-        font-size: 12px // TODO: em!
-        font-weight: 400
-      &:hover
-        transition: 0.5s
-        background: #383838
+      font-size: 14px //TODO: em
+      font-weight: 400
+      cursor: pointer
+
+  .notes
+
     &:last-child
       margin-bottom: 50px

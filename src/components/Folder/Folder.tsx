@@ -1,16 +1,27 @@
 import React from 'react'
 import "./Folder.sass"
+import {gql, useQuery} from "@apollo/client";
 
 type folderType = {
-    folderCount: number
-    folderName: string
+    folder: any //TODO: any
 }
 
+const GGGG = gql`
+    query getNotesByFolder($folderid: ID) {
+        getNotesByFolder(folderid: $folderid){
+            id
+        }
+    }
+`
+
 const Folder: React.FC<folderType> = (props) => {
+
+    const { loading, data, error} = useQuery(GGGG, {variables: {folderid: props.folder.id}})
+
     return (
         <div className="folder">
             <div className="folder-info">
-                <div className="folder-count">{props.folderCount}</div>
+                <div className="folder-count">{data ? data.getNotesByFolder.length : " - "}</div>
                 <div className="folder-settings">
                     <div className="oval"> </div>
                     <div className="oval"> </div>
@@ -18,7 +29,7 @@ const Folder: React.FC<folderType> = (props) => {
                 </div>
             </div>
             <div className="folder-image"> </div>
-            <p className="folder-name">{props.folderName}</p>
+            <p className="folder-name">{props.folder.name}</p>
         </div>
     );
 };

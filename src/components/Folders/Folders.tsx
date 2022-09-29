@@ -2,11 +2,27 @@ import React, {useEffect, useRef, useState} from 'react';
 import Folder from "../Folder/Folder"
 import Arrow from "../Arrow/Arrow"
 import "./Folders.sass"
+import {gql, useQuery} from "@apollo/client";
+
+const GET_ALL_FOLDERS = gql`
+    query getAllFolders($userid: ID) {
+        getAllFolders(userid: $userid){
+            id
+            name
+        }
+    }
+`
+
+
 
 const Folders = () => {
 
+    const { loading, data, error} = useQuery(GET_ALL_FOLDERS, {variables: {userid: "1"}})
+
+
     let [position, setPosition] = useState(0)
-    let folderCount = 6
+    let folderCount
+    data ? folderCount = data.getAllFolders.length : folderCount = 0
     const gg = useRef(null)
     const folderSection = useRef(null)
     const folderWidth = 200
@@ -56,7 +72,7 @@ const Folders = () => {
     return (
         <div className="folders-section" ref={folderSection}>
             <p className="name-section">Папки</p>
-            <p className="section-count">Всего 6 папок</p>
+            <p className="section-count">{`Всего ${folderCount} папок`}</p>
             <div className="folders">
                 <Arrow gg={gg}
                        position={position}
@@ -72,12 +88,17 @@ const Folders = () => {
 
                     <div ref={gg} className="itemser">
 
-                        <Folder folderCount={55} folderName="Неотсортированные"/>
-                        <Folder folderCount={55} folderName="Неотсортированные"/>
-                        <Folder folderCount={55} folderName="Неотсортированные"/>
-                        <Folder folderCount={55} folderName="Неотсортированные"/>
-                        <Folder folderCount={55} folderName="Неотсортированные"/>
-                        <Folder folderCount={55} folderName="Неотсортированные"/>
+                        {data
+                            ? data.getAllFolders.map( (i: any) => <Folder folder={i}/>) // TODO: any
+                            : " "
+                        }
+
+                        {/*<Folder folderCount={55} folderName="Неотсортированные"/>*/}
+                        {/*<Folder folderCount={55} folderName="Неотсортированные"/>*/}
+                        {/*<Folder folderCount={55} folderName="Неотсортированные"/>*/}
+                        {/*<Folder folderCount={55} folderName="Неотсортированные"/>*/}
+                        {/*<Folder folderCount={55} folderName="Неотсортированные"/>*/}
+                        {/*<Folder folderCount={55} folderName="Неотсортированные"/>*/}
 
 
 
