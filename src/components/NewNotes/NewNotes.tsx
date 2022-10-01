@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import "./NewNotes.sass"
 import {gql, useMutation, useQuery} from "@apollo/client"
+import { useNavigate } from "react-router-dom"
 import Note from "../Note/Note"
 
 const GET_ALL_NOTES = gql`
@@ -24,6 +25,8 @@ const DELETE_NOTE_BY_ID = gql`
 
 
 const NewNotes = () => {
+    const navigate = useNavigate()
+    const createNoteEvent = () => navigate('/note-creator')
 
     const [deleteNote] = useMutation(DELETE_NOTE_BY_ID)
 
@@ -33,7 +36,8 @@ const NewNotes = () => {
     }
 
     const { loading, data, error, refetch} = useQuery(GET_ALL_NOTES, {variables: {userid: "1"}})
-    console.log(data)
+    //@ts-ignore TODO:fix
+    useEffect(() => refetch(), [])
 
     return (
         <div className="notes-section">
@@ -42,7 +46,7 @@ const NewNotes = () => {
                     <p className="name-section">Заметки</p>
                     <p className="section-count">{`Всего ${data ? data.getAllNotes.length : "0"} заметок`}</p>
                 </div>
-                <div className="create-note">
+                <div className="create-note" onClick={createNoteEvent}>
                     Создать заметку
                 </div>
             </div>

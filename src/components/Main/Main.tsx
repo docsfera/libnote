@@ -28,10 +28,24 @@ const DELETE_NOTE_BY_ID = gql`
     }
     `;
 
+const GET_ALL_NOTES = gql`
+    query getAllNotes($userid: ID) {
+        getAllNotes(userid: $userid){
+            id
+            title
+            content
+            dateupdate
+        }
+    }
+`
+
 const Main = () => {
 
 
+    const { loading, data, error, refetch} = useQuery(GET_ALL_NOTES, {variables: {userid: "1"}})
 
+    useEffect(() => console.log("update"), [data])
+    const numOfNotes: any = (data && data.getAllNotes) && data.getAllNotes.length
 
 
 
@@ -39,7 +53,7 @@ const Main = () => {
     return (
         <div className="main">
             <Header/>
-            <Folders/>
+            <Folders numOfNotes={numOfNotes}/>
             <NewBooks/>
             <NewNotes/>
             {/*<LatestBooks/>*/}

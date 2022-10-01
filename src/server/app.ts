@@ -33,6 +33,7 @@ const schema = buildSchema(`
     type Folder{
         id: ID
         name: String
+        countofnotes: Int
     }
     
     type Note {
@@ -52,6 +53,7 @@ const schema = buildSchema(`
         id: ID
         name: String!
         userid: ID!
+        countofnotes: Int!
     }
     input BookInput{
         id: ID
@@ -123,8 +125,8 @@ const root = {
         , [input.userid, input.name, input.image])
         .then(res => res.rows[0])
     ,
-    createFolder: async ({input}: any) => await pool.query('INSERT INTO folders (userid, name) VALUES ($1, $2) RETURNING *'
-        , [input.userid, input.name])
+    createFolder: async ({input}: any) => await pool.query('INSERT INTO folders (userid, name, countofnotes) VALUES ($1, $2, $3) RETURNING *'
+        , [input.userid, input.name, input.countofnotes])
         .then(res => res.rows[0])
     ,
     getAllFolders: async ({userid}: any) => await pool.query('SELECT * FROM folders WHERE userid = ($1)'

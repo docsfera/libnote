@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import Folder from "../Folder/Folder"
 import Arrow from "../Arrow/Arrow"
 import "./Folders.sass"
@@ -13,61 +13,57 @@ const GET_ALL_FOLDERS = gql`
     }
 `
 
+const GGGG = gql`
+    query getNotesByFolder($folderid: ID) {
+        getNotesByFolder(folderid: $folderid){
+            id
+        }
+    }
+`
+
+type FoldersType = {
+    numOfNotes: any
+}
 
 
-const Folders = () => {
+const Folders: React.FC<FoldersType> = (props) => {
 
-    const { loading, data, error} = useQuery(GET_ALL_FOLDERS, {variables: {userid: "1"}})
+
+    const { loading, data, error, refetch} = useQuery(GET_ALL_FOLDERS, {variables: {userid: "1"}})
+
+
+
+
+
+    const useGetCountNotesByFolder = (folderid: any) => {
+        const { data} = useQuery(GGGG, {variables: {folderid}});
+        if(data && data.getNotesByFolder) {
+            return data.getNotesByFolder.length
+        }else{
+            return 0
+        }
+    }
+
+
+    //@ts-ignore TODO:fix
+    useEffect(() => {
+        refetch()
+        console.log(data)
+    }, [props.numOfNotes])
+
 
 
     let [position, setPosition] = useState(0)
     let folderCount
+    ///const noteCountInFolder = {}
     data ? folderCount = data.getAllFolders.length : folderCount = 0
+    //@ts-ignore
+    // (data && data.getAllFolders) && data.getAllFolders.map((i) => noteCountInFolder[i.id] =
+    //     useQuery(GGGG, {variables: {folderid: i.id}}))
     const gg = useRef(null)
     const folderSection = useRef(null)
     const folderWidth = 200
 
-
-
-    // const min = () => {
-    //     let newPosition = position - folderWidth
-    //     checkBtns(newPosition)
-    //     setPosition(newPosition)
-    //     console.log(newPosition)
-    //     //@ts-ignore
-    //     gg.current.style = `transition: 0.5s; transform:translateX(-${newPosition}px)`
-    // }
-    //
-    // const plus = () => {
-    //     let newPosition = position + folderWidth
-    //     checkBtns(newPosition)
-    //     setPosition(newPosition)
-    //     //@ts-ignore
-    //     gg.current.style = `transition: 0.5s; transform: translateX(-${newPosition}px)`
-    // }
-
-    // const checkBtns = (position: number) => {
-    //     console.log(plusBtn)
-    //     //@ts-ignore
-    //     console.log(folderSection.current.offsetWidth);
-    //     //@ts-ignore
-    //     (position === 0) ? minBtn.current.style.display = "none" : minBtn.current.style.display = "block";
-    //     //@ts-ignore
-    //     console.log(folderSection.current.offsetWidth, folderWidth * folderCount)
-    //     //@ts-ignore
-    //     if(folderSection.current.offsetWidth > folderWidth * folderCount){
-    //
-    //         //@ts-ignore
-    //         plusBtn.current.style.display = "none"
-    //     }else{
-    //         //@ts-ignore
-    //         (position >= (folderCount - 4) * folderWidth) ?  plusBtn.current.style.display = "none" : plusBtn.current.style.display = "block"
-    //     }
-    //
-    // }
-    // useEffect(() => checkBtns(0),
-    //     //@ts-ignore
-    //     [])
 
     return (
         <div className="folders-section" ref={folderSection}>
@@ -89,7 +85,11 @@ const Folders = () => {
                     <div ref={gg} className="itemser">
 
                         {data
-                            ? data.getAllFolders.map( (i: any) => <Folder folder={i}/>) // TODO: any
+                            ? data.getAllFolders.map( (i: any) => <Folder folder={i}
+                                                                          key={i.id}
+                                                                          numOfNotes={props.numOfNotes}
+                                                                          useGetCountNotesByFolder={useGetCountNotesByFolder}
+                                                                          />) // TODO: any
                             : " "
                         }
 

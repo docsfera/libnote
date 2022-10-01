@@ -5,6 +5,7 @@ import Aside from "./components/Aside/Aside"
 import Main from "./components/Main/Main"
 import Books from "./components/ Books/Books";
 import Notes from "./components/Notes/Notes";
+import NoteCreator from "./components/NoteCreator/NoteCreator";
 
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
             <Route path='/' element={<Main />}/>
             <Route path='/books' element={<Books />}/>
             <Route path='/notes' element={<Notes />}/>
+            <Route path='/note-creator' element={<NoteCreator />}/>
 
         </Routes>
     </div>
