@@ -3,6 +3,7 @@ import "./Note.sass"
 // TODO: type of function!
 type NoteProps = {
     noteId: string
+    folderId: any
     noteName: string
     noteContent: string
     dateUpdate: string
@@ -21,7 +22,7 @@ const Note: React.FC<NoteProps> = (props) => {
 
     return (
         <div className="note">
-            <div className="delete-note" onClick={() => props.deleteNoteEvent(props.noteId)}> </div>
+            <div className="delete-note" onClick={() => props.deleteNoteEvent(props.noteId, props.folderId)}> </div>
             <div className="note-wrapper">
                 <div className="note-info">
                     <p className="note-name">{props.noteName}</p>

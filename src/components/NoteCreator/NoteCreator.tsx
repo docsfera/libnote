@@ -20,6 +20,14 @@ const CREATE_NOTE = gql`
         }
     }
 `
+const UPDATE_FOLDER_COUNT_NOTES = gql`
+    mutation updateFolderCountNotes($folderid: ID, $mode: String){
+        updateFolderCountNotes(folderid: $folderid, mode: $mode) {
+            id
+        }
+    }
+
+`
 
 
 
@@ -27,6 +35,7 @@ const NoteCreator = () => {
     const navigate = useNavigate()
     const { loading, data, error} = useQuery(GET_ALL_FOLDERS, {variables: {userid: "1"}})
     const [createNote] = useMutation(CREATE_NOTE)
+    const [updateFolderCountNotes] = useMutation(UPDATE_FOLDER_COUNT_NOTES)
     const [nameSelectedFolder, setNameSelectedFolder] = useState("")
     const [idSelectedFolder, setIdSelectedFolder] = useState<string | null>(null)
 
@@ -54,13 +63,6 @@ const NoteCreator = () => {
     }
 
     const createNoteEvent = async () => { // TODO: rename?
-
-        // input NoteInput {
-        //     id: ID
-        //     userid: ID!
-        //     bookid: ID
-        //     folderid: ID
-
         await createNote(
             {
                 variables: {
@@ -74,6 +76,9 @@ const NoteCreator = () => {
                     }
                 }
             })
+        console.log({folderid: idSelectedFolder, mode: "+"})
+        await updateFolderCountNotes({variables: {folderid: idSelectedFolder, mode: "+"}})
+
         navigate('../')
     }
 

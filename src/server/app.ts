@@ -39,6 +39,8 @@ const schema = buildSchema(`
     type Note {
         id: ID
         title: String
+        folderid: ID
+        bookid: ID
         content: String
         datecreate: String
         dateupdate: String
@@ -87,6 +89,8 @@ const schema = buildSchema(`
         createUser(input: UserInput): User
         createNote(input: NoteInput): Note
         deleteNoteById(noteid: ID): Note
+        updateFolderName(folderid: ID, name: String): Folder
+        updateFolderCountNotes(folderid: ID, mode: String): Folder
     }
 
 `)
@@ -118,8 +122,8 @@ const root = {
         .then(res => res.rows)
     ,
     deleteNoteById: async ({noteid}: any) => await pool.query('DELETE FROM notes WHERE id = ($1) RETURNING *'
-        , [+noteid])
-        .then(res => res.rows[0])
+            , [+noteid])
+            .then(res => res.rows[0])
     ,
     createBook: async ({input}: any) => await pool.query('INSERT INTO books (userid, name, image) VALUES ($1, $2, $3) RETURNING *'
         , [input.userid, input.name, input.image])
@@ -128,6 +132,26 @@ const root = {
     createFolder: async ({input}: any) => await pool.query('INSERT INTO folders (userid, name, countofnotes) VALUES ($1, $2, $3) RETURNING *'
         , [input.userid, input.name, input.countofnotes])
         .then(res => res.rows[0])
+    ,
+    updateFolderName: async ({folderid, name}: any) => await pool.query('UPDATE folders SET name = ($1) WHERE id = ($2) RETURNING *'
+        , [name, folderid])
+        .then(res => res.rows[0])
+    ,
+    updateFolderCountNotes: async ({folderid, mode}: any) => {
+        const countofnotes = await pool.query('SELECT countofnotes FROM folders WHERE id = ($1)',
+            [+folderid]).then(res => res.rows[0].countofnotes)
+
+        if(mode === "-"){
+            await pool.query('UPDATE folders SET countofnotes = ($1) WHERE id = ($2)'
+                , [countofnotes - 1, +folderid])
+        }else{
+            await pool.query('UPDATE folders SET countofnotes = ($1) WHERE id = ($2)'
+                , [countofnotes + 1, +folderid])
+        }
+    }
+
+
+
     ,
     getAllFolders: async ({userid}: any) => await pool.query('SELECT * FROM folders WHERE userid = ($1)'
         , [+userid])

@@ -9,6 +9,7 @@ const GET_ALL_FOLDERS = gql`
         getAllFolders(userid: $userid){
             id
             name
+            countofnotes
         }
     }
 `
@@ -27,43 +28,25 @@ type FoldersType = {
 
 
 const Folders: React.FC<FoldersType> = (props) => {
-
+    useEffect(() => {refetch()}, [props.numOfNotes])
 
     const { loading, data, error, refetch} = useQuery(GET_ALL_FOLDERS, {variables: {userid: "1"}})
 
-
-
-
+    let [position, setPosition] = useState(0)
+    let folderCount
+    data ? folderCount = data.getAllFolders.length : folderCount = 0
+    const gg = useRef(null)
+    const folderSection = useRef(null)
+    const folderWidth = 200
 
     const useGetCountNotesByFolder = (folderid: any) => {
-        const { data} = useQuery(GGGG, {variables: {folderid}});
+        const { data} = useQuery(GGGG, {variables: {folderid}})
         if(data && data.getNotesByFolder) {
             return data.getNotesByFolder.length
         }else{
             return 0
         }
     }
-
-
-    //@ts-ignore TODO:fix
-    useEffect(() => {
-        refetch()
-        console.log(data)
-    }, [props.numOfNotes])
-
-
-
-    let [position, setPosition] = useState(0)
-    let folderCount
-    ///const noteCountInFolder = {}
-    data ? folderCount = data.getAllFolders.length : folderCount = 0
-    //@ts-ignore
-    // (data && data.getAllFolders) && data.getAllFolders.map((i) => noteCountInFolder[i.id] =
-    //     useQuery(GGGG, {variables: {folderid: i.id}}))
-    const gg = useRef(null)
-    const folderSection = useRef(null)
-    const folderWidth = 200
-
 
     return (
         <div className="folders-section" ref={folderSection}>
@@ -81,28 +64,15 @@ const Folders: React.FC<FoldersType> = (props) => {
                 />
 
                 <div className="folders-container">
-
                     <div ref={gg} className="itemser">
-
                         {data
-                            ? data.getAllFolders.map( (i: any) => <Folder folder={i}
-                                                                          key={i.id}
-                                                                          numOfNotes={props.numOfNotes}
-                                                                          useGetCountNotesByFolder={useGetCountNotesByFolder}
-                                                                          />) // TODO: any
+                            ? data.getAllFolders.map( (i: any) =>
+                                <Folder folder={i}
+                                        key={i.id}
+                                        useGetCountNotesByFolder={useGetCountNotesByFolder}
+                                />) // TODO: any
                             : " "
                         }
-
-                        {/*<Folder folderCount={55} folderName="Неотсортированные"/>*/}
-                        {/*<Folder folderCount={55} folderName="Неотсортированные"/>*/}
-                        {/*<Folder folderCount={55} folderName="Неотсортированные"/>*/}
-                        {/*<Folder folderCount={55} folderName="Неотсортированные"/>*/}
-                        {/*<Folder folderCount={55} folderName="Неотсортированные"/>*/}
-                        {/*<Folder folderCount={55} folderName="Неотсортированные"/>*/}
-
-
-
-
                     </div>
 
                 </div>
