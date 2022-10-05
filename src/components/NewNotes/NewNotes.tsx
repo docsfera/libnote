@@ -38,14 +38,18 @@ const NewNotes = () => {
     useEffect(() => {refetch()}, [])
 
     const navigate = useNavigate()
-    const createNoteEvent = () => navigate('/note-creator')
+    const goToNoteCreator = (noteId? : string) => {
+        noteId ? navigate(`/note-creator/${noteId}`) : navigate(`/note-creator`)
+        //, { state: { noteId }}
+    }
 
     const [deleteNote] = useMutation(DELETE_NOTE_BY_ID)
     const [updateFolderCountNotes] = useMutation(UPDATE_FOLDER_COUNT_NOTES)
 
     const deleteNoteEvent = async (noteId: string, folderId: any) => {
         await deleteNote({variables: {noteid: noteId}})
-        await updateFolderCountNotes({variables: {folderid: folderId, mode: "-"}})
+        folderId && await updateFolderCountNotes({variables: {folderid: folderId, mode: "-"}})
+
         await refetch()
     }
 
@@ -58,7 +62,7 @@ const NewNotes = () => {
                     <p className="name-section">Заметки</p>
                     <p className="section-count">{`Всего ${data ? data.getAllNotes.length : "0"} заметок`}</p>
                 </div>
-                <div className="create-note" onClick={createNoteEvent}>
+                <div className="create-note" onClick={() => goToNoteCreator()}>
                     Создать заметку
                 </div>
             </div>
@@ -71,6 +75,7 @@ const NewNotes = () => {
                                                              dateUpdate={i.dateupdate}
                                                              deleteNoteEvent={deleteNoteEvent}
                                                              noteName={i.title}
+                                                             goToNoteCreator={goToNoteCreator}
                     />)
                     : " "}
 

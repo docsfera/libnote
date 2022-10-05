@@ -77,10 +77,11 @@ const schema = buildSchema(`
     
     type Query {
         getAllUsers: [User]
+        getNoteById(id: ID): Note
         getUserById(id: ID): User
         getAllNotes(userid: ID): [Note]
         getAllFolders(userid: ID): [Folder]
-        getNotesByFolder(folderid: ID): [Note]
+        getNotesByFolder(folderid: ID): [Note] 
     }
     
     type Mutation {
@@ -89,8 +90,11 @@ const schema = buildSchema(`
         createUser(input: UserInput): User
         createNote(input: NoteInput): Note
         deleteNoteById(noteid: ID): Note
+        deleteFolderById(id: ID): Folder
         updateFolderName(folderid: ID, name: String): Folder
         updateFolderCountNotes(folderid: ID, mode: String): Folder
+        updateNote(input: NoteInput): Note
+       
     }
 
 `)
@@ -107,6 +111,10 @@ const root = {
     getUserById: async (params: any) => await pool.query('SELECT * FROM users WHERE id = ($1)'
         , [params.id])
         .then(res => res.rows[0])
+    ,
+    getNoteById: async ({id}: any) => await pool.query('SELECT * FROM notes WHERE id = ($1)'
+    , [id])
+    .then(res => res.rows[0])
     ,
     createUser: async ({input}: any) => await pool.query('INSERT INTO users (mail, password) VALUES ($1, $2) RETURNING *'
         , [input.mail, input.password])
@@ -125,6 +133,12 @@ const root = {
             , [+noteid])
             .then(res => res.rows[0])
     ,
+    deleteFolderById: async ({id}: any) => { //TODO: doent send response
+        await pool.query('UPDATE notes SET folderid = null WHERE folderid = ($1)', [+id])
+            .then(() => pool.query('DELETE FROM folders WHERE id = ($1) RETURNING *'
+            , [+id])).then(res => res.rows[0])
+    }
+    ,
     createBook: async ({input}: any) => await pool.query('INSERT INTO books (userid, name, image) VALUES ($1, $2, $3) RETURNING *'
         , [input.userid, input.name, input.image])
         .then(res => res.rows[0])
@@ -136,6 +150,10 @@ const root = {
     updateFolderName: async ({folderid, name}: any) => await pool.query('UPDATE folders SET name = ($1) WHERE id = ($2) RETURNING *'
         , [name, folderid])
         .then(res => res.rows[0])
+    ,
+    updateNote: async ({input}: any) => await pool.query('UPDATE notes SET folderid = ($2), bookid = ($3), title = ($4), content = ($5), datecreate = ($6), dateupdate = ($7) WHERE id = ($1) RETURNING *'
+    , [input.id, input.folderid, input.bookid, input.title, input.content, input.datecreate, input.dateupdate])
+    .then(res => res.rows[0])
     ,
     updateFolderCountNotes: async ({folderid, mode}: any) => {
         const countofnotes = await pool.query('SELECT countofnotes FROM folders WHERE id = ($1)',

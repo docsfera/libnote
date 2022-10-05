@@ -17,6 +17,7 @@ function App() {
             <Route path='/books' element={<Books />}/>
             <Route path='/notes' element={<Notes />}/>
             <Route path='/note-creator' element={<NoteCreator />}/>
+            <Route path='/note-creator/:id' element={<NoteCreator />}/>
 
         </Routes>
     </div>

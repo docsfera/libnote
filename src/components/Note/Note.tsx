@@ -8,6 +8,7 @@ type NoteProps = {
     noteContent: string
     dateUpdate: string
     deleteNoteEvent: any
+    goToNoteCreator: any
 }
 
 const Note: React.FC<NoteProps> = (props) => {
@@ -21,8 +22,11 @@ const Note: React.FC<NoteProps> = (props) => {
     // }
 
     return (
-        <div className="note">
-            <div className="delete-note" onClick={() => props.deleteNoteEvent(props.noteId, props.folderId)}> </div>
+        <div className="note" onClick={() => props.goToNoteCreator(props.noteId)}>
+            <div className="delete-note" onClick={(e) => {
+                e.stopPropagation();
+                props.deleteNoteEvent(props.noteId, props.folderId)
+            }}> </div>
             <div className="note-wrapper">
                 <div className="note-info">
                     <p className="note-name">{props.noteName}</p>

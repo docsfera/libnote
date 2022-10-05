@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import Folder from "../Folder/Folder"
 import Arrow from "../Arrow/Arrow"
 import "./Folders.sass"
-import {gql, useQuery} from "@apollo/client";
+import {gql, useMutation, useQuery} from "@apollo/client";
 
 const GET_ALL_FOLDERS = gql`
     query getAllFolders($userid: ID) {
@@ -22,6 +22,17 @@ const GGGG = gql`
     }
 `
 
+const CREATE_FOLDER = gql`
+    mutation createFolder($input: FolderInput){
+        createFolder(input: $input) {
+            id
+        }
+    }
+`
+
+
+
+
 type FoldersType = {
     numOfNotes: any
 }
@@ -32,7 +43,22 @@ const Folders: React.FC<FoldersType> = (props) => {
 
     const { loading, data, error, refetch} = useQuery(GET_ALL_FOLDERS, {variables: {userid: "1"}})
 
+
     let [position, setPosition] = useState(0)
+    const [createFolder] = useMutation(CREATE_FOLDER)
+    const createFolderEvent = async () => {
+        await createFolder(
+            {
+                variables: {
+                    input: {
+                        userid: "1",
+                        name: "name",
+                        countofnotes: 0
+                    }
+                }
+            })
+        refetch()
+        }
     let folderCount
     data ? folderCount = data.getAllFolders.length : folderCount = 0
     const gg = useRef(null)
@@ -50,8 +76,17 @@ const Folders: React.FC<FoldersType> = (props) => {
 
     return (
         <div className="folders-section" ref={folderSection}>
-            <p className="name-section">Папки</p>
-            <p className="section-count">{`Всего ${folderCount} папок`}</p>
+            <div className="folders-wrapper">
+                <div className="folders-info">
+                    <p className="name-section">Папки</p>
+                    <p className="section-count">{`Всего ${folderCount} папок`}</p>
+                </div>
+                <div className="create-folder" onClick={createFolderEvent}>
+                    Создать папку
+                </div>
+            </div>
+
+
             <div className="folders">
                 <Arrow gg={gg}
                        position={position}
@@ -70,6 +105,7 @@ const Folders: React.FC<FoldersType> = (props) => {
                                 <Folder folder={i}
                                         key={i.id}
                                         useGetCountNotesByFolder={useGetCountNotesByFolder}
+                                        refetchFolders={refetch}
                                 />) // TODO: any
                             : " "
                         }

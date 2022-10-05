@@ -1,14 +1,26 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Header from "../Header/Header"
 import './NoteCreator.sass'
 import {gql, useMutation, useQuery} from "@apollo/client";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
+
 
 const GET_ALL_FOLDERS = gql`
     query getAllFolders($userid: ID) {
         getAllFolders(userid: $userid){
             id
             name
+        }
+    }
+`
+
+const GET_NOTE_BY_ID = gql`
+    query getNoteById($id: ID) {
+        getNoteById(id: $id){
+            id
+            folderid
+            title
+            content
         }
     }
 `
@@ -20,6 +32,15 @@ const CREATE_NOTE = gql`
         }
     }
 `
+const UPDATE_NOTE = gql`
+      mutation updateNote($input: NoteInput) {
+        updateNote(input: $input){
+            id
+        }
+    }
+`
+
+
 const UPDATE_FOLDER_COUNT_NOTES = gql`
     mutation updateFolderCountNotes($folderid: ID, $mode: String){
         updateFolderCountNotes(folderid: $folderid, mode: $mode) {
@@ -30,23 +51,67 @@ const UPDATE_FOLDER_COUNT_NOTES = gql`
 `
 
 
+// const useGg = (id: string | undefined): any => {
+//     id ? useQuery(GET_NOTE_BY_ID, {variables: {id}}).data : {}
+// }
+
 
 const NoteCreator = () => {
+    const {id} = useParams()
+
+    const currentNoteData = useQuery(GET_NOTE_BY_ID, {variables: {id}}).data
+    console.log({id, currentNoteData})
+
+
+
+    const [noteName, setNoteName] = useState("Untitled")
+    const [noteContent, setNoteContent] = useState("")
+    const [beginFolderId, setBeginFolderId] = useState(null)
     const navigate = useNavigate()
     const { loading, data, error} = useQuery(GET_ALL_FOLDERS, {variables: {userid: "1"}})
+
+    //let currentNoteData = useGg(id)
+
+
+
+
     const [createNote] = useMutation(CREATE_NOTE)
+    const [updateNote] = useMutation(UPDATE_NOTE)
+
     const [updateFolderCountNotes] = useMutation(UPDATE_FOLDER_COUNT_NOTES)
     const [nameSelectedFolder, setNameSelectedFolder] = useState("")
     const [idSelectedFolder, setIdSelectedFolder] = useState<string | null>(null)
 
     const allFolder = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        if(currentNoteData && currentNoteData.getNoteById){
+            setNoteName(currentNoteData.getNoteById.title)
+            setNoteContent(currentNoteData.getNoteById.content)
+            setIdSelectedFolder(currentNoteData.getNoteById.folderid)
+            setBeginFolderId(currentNoteData.getNoteById.folderid)
+
+            currentNoteData.getNoteById.folderid && setNameSelectedFolder(data.getAllFolders.filter((i: any) => (i.id === currentNoteData.getNoteById.folderid))[0].name)
+
+        }
+
+    }, [currentNoteData])
+
+
+
+
+
     //const currentFolderElement = useRef<HTMLDivElement>(null)
     const showAllFolder = () => {
         if(allFolder && allFolder.current) {
-            if(allFolder.current.style.display === "none"){
+            if(allFolder.current.style.cssText == ""){
                 allFolder.current.style.display = "block"
             }else{
-                allFolder.current.style.display = "none"
+                if(allFolder.current.style.display === "none"){
+                    allFolder.current.style.display = "block"
+                }else{
+                    allFolder.current.style.display = "none"
+                }
             }
         }
     }
@@ -63,21 +128,42 @@ const NoteCreator = () => {
     }
 
     const createNoteEvent = async () => { // TODO: rename?
-        await createNote(
-            {
-                variables: {
-                    input: {
-                        userid: "1",
-                        folderid: idSelectedFolder,
-                        title: "title",
-                        content: "content",
-                        datecreate: "1",
-                        dateupdate: "1"
+        if(!id){
+            await createNote(
+                {
+                    variables: {
+                        input: {
+                            userid: "1",
+                            folderid: idSelectedFolder,
+                            title: (noteName === "") ? "Untitled" : noteName,
+                            content: noteContent,
+                            datecreate: String(Date.now()),
+                            dateupdate: String(Date.now())
+                        }
                     }
-                }
-            })
-        console.log({folderid: idSelectedFolder, mode: "+"})
-        await updateFolderCountNotes({variables: {folderid: idSelectedFolder, mode: "+"}})
+                })
+            idSelectedFolder && await updateFolderCountNotes({variables: {folderid: idSelectedFolder, mode: "+"}})
+        }else{
+            await updateNote(
+                {
+                    variables: {
+                        input: {
+                            id,
+                            userid: "1",
+                            folderid: idSelectedFolder,
+                            title: (noteName === "") ? "Untitled" : noteName,
+                            content: noteContent,
+                            datecreate: String(Date.now()),
+                            dateupdate: String(Date.now())
+                        }
+                    }
+                })
+            if(beginFolderId !== idSelectedFolder){
+                await updateFolderCountNotes({variables: {folderid: beginFolderId, mode: "-"}})
+                await updateFolderCountNotes({variables: {folderid: idSelectedFolder, mode: "+"}})
+            }
+        }
+
 
         navigate('../')
     }
@@ -87,11 +173,11 @@ const NoteCreator = () => {
             <Header/>
             <div className="note-creator">
                 <div className="note-info">
-                    <p className="note-name">Название заметки</p>
-                    <div className="note-content">
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aspernatur, at corporis
-                        culpa cupiditate dolorem dolores ducimus earum et fuga hic impedit laborum magni
-                        maxime natus nihil perspiciatis praesentium quibusdam quidem rerum saepe sit tempore totam vel vero voluptatibus? Animi dignissimos dolor eos expedita id illo mollitia nobis, obcaecati quas tempore.
+
+                    <p className="note-name" contentEditable="true" onBlur={(e) => setNoteName(e.target.innerText)}>{noteName}</p>
+                    <div className="note-content" contentEditable="true"
+                         onBlur={(e) => setNoteContent(e.target.innerText)}>
+                        {noteContent}
                     </div>
                 </div>
 
