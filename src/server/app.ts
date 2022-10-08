@@ -32,6 +32,7 @@ const schema = buildSchema(`
     }
     type Folder{
         id: ID
+        userid: ID
         name: String
         countofnotes: Int
     }
@@ -79,6 +80,7 @@ const schema = buildSchema(`
         getAllUsers: [User]
         getNoteById(id: ID): Note
         getUserById(id: ID): User
+        getFolderById(id: ID): Folder
         getAllNotes(userid: ID): [Note]
         getAllFolders(userid: ID): [Folder]
         getNotesByFolder(folderid: ID): [Note] 
@@ -116,6 +118,10 @@ const root = {
     , [id])
     .then(res => res.rows[0])
     ,
+    getFolderById: async ({id}: any) => await pool.query('SELECT * FROM folders WHERE id = ($1)'
+        , [id])
+        .then(res => res.rows[0])
+    ,
     createUser: async ({input}: any) => await pool.query('INSERT INTO users (mail, password) VALUES ($1, $2) RETURNING *'
         , [input.mail, input.password])
         .then(res => res.rows[0])
@@ -136,7 +142,10 @@ const root = {
     deleteFolderById: async ({id}: any) => { //TODO: doent send response
         await pool.query('UPDATE notes SET folderid = null WHERE folderid = ($1)', [+id])
             .then(() => pool.query('DELETE FROM folders WHERE id = ($1) RETURNING *'
-            , [+id])).then(res => res.rows[0])
+            , [+id])).then(res => {
+                console.log(res.rows[0])
+                return res.rows[0]
+            })
     }
     ,
     createBook: async ({input}: any) => await pool.query('INSERT INTO books (userid, name, image) VALUES ($1, $2, $3) RETURNING *'

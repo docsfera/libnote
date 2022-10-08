@@ -7,8 +7,8 @@ type NoteProps = {
     noteName: string
     noteContent: string
     dateUpdate: string
-    deleteNoteEvent: any
-    goToNoteCreator: any
+    deleteNoteEvent?: any
+    goToNoteCreator?: any
 }
 
 const Note: React.FC<NoteProps> = (props) => {

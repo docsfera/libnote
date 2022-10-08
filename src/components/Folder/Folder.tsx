@@ -6,6 +6,7 @@ type folderType = {
     folder: any //TODO: any
     useGetCountNotesByFolder: any
     refetchFolders: any
+    showFolderNotes: any
 }
 
 const GET_NOTES_BY_FOLDER = gql`
@@ -81,7 +82,7 @@ const Folder: React.FC<folderType> = (props) => {
 
                 </div>
             </div>
-            <div className="folder-image"> </div>
+            <div className="folder-image" onClick={() => props.showFolderNotes(props.folder.id)}> </div>
             <p className="folder-name">{props.folder.name}</p>
         </div>
     );

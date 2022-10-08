@@ -1,8 +1,8 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react'
 import Header from "../Header/Header"
 import './NoteCreator.sass'
-import {gql, useMutation, useQuery} from "@apollo/client";
-import {useNavigate, useParams} from "react-router-dom";
+import {gql, useMutation, useQuery} from "@apollo/client"
+import {useLocation, useNavigate, useParams} from "react-router-dom"
 
 
 const GET_ALL_FOLDERS = gql`
@@ -57,51 +57,47 @@ const UPDATE_FOLDER_COUNT_NOTES = gql`
 
 
 const NoteCreator = () => {
+    const navigate = useNavigate()
     const {id} = useParams()
+    const { state }: any = useLocation() //TODO: any
 
     const currentNoteData = useQuery(GET_NOTE_BY_ID, {variables: {id}}).data
-    console.log({id, currentNoteData})
+    const { loading, data, error} = useQuery(GET_ALL_FOLDERS, {variables: {userid: "1"}})
 
-
+    const [createNote] = useMutation(CREATE_NOTE)
+    const [updateNote] = useMutation(UPDATE_NOTE)
+    const [updateFolderCountNotes] = useMutation(UPDATE_FOLDER_COUNT_NOTES)
 
     const [noteName, setNoteName] = useState("Untitled")
     const [noteContent, setNoteContent] = useState("")
     const [beginFolderId, setBeginFolderId] = useState(null)
-    const navigate = useNavigate()
-    const { loading, data, error} = useQuery(GET_ALL_FOLDERS, {variables: {userid: "1"}})
-
-    //let currentNoteData = useGg(id)
-
-
-
-
-    const [createNote] = useMutation(CREATE_NOTE)
-    const [updateNote] = useMutation(UPDATE_NOTE)
-
-    const [updateFolderCountNotes] = useMutation(UPDATE_FOLDER_COUNT_NOTES)
     const [nameSelectedFolder, setNameSelectedFolder] = useState("")
     const [idSelectedFolder, setIdSelectedFolder] = useState<string | null>(null)
 
     const allFolder = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
+        // Если обрабатывается существующая заметка
         if(currentNoteData && currentNoteData.getNoteById){
             setNoteName(currentNoteData.getNoteById.title)
             setNoteContent(currentNoteData.getNoteById.content)
             setIdSelectedFolder(currentNoteData.getNoteById.folderid)
             setBeginFolderId(currentNoteData.getNoteById.folderid)
 
-            currentNoteData.getNoteById.folderid && setNameSelectedFolder(data.getAllFolders.filter((i: any) => (i.id === currentNoteData.getNoteById.folderid))[0].name)
+            currentNoteData.getNoteById.folderid && setNameSelectedFolder(data.getAllFolders.filter((i: any) =>
+                (i.id === currentNoteData.getNoteById.folderid))[0].name)
 
+        }
+        // Если обрабатывается заметка созданная из папки
+        if(state && state.folderId){
+            setIdSelectedFolder(state.folderId)
+            setBeginFolderId(state.folderId)
+            setNameSelectedFolder(data.getAllFolders.filter((i: any) =>
+                (i.id === state.folderId))[0].name)
         }
 
     }, [currentNoteData])
 
-
-
-
-
-    //const currentFolderElement = useRef<HTMLDivElement>(null)
     const showAllFolder = () => {
         if(allFolder && allFolder.current) {
             if(allFolder.current.style.cssText == ""){
@@ -159,13 +155,13 @@ const NoteCreator = () => {
                     }
                 })
             if(beginFolderId !== idSelectedFolder){
-                await updateFolderCountNotes({variables: {folderid: beginFolderId, mode: "-"}})
-                await updateFolderCountNotes({variables: {folderid: idSelectedFolder, mode: "+"}})
+                await updateFolderCountNotes({variables: {folderid: beginFolderId, mode: "-"}})    // TODO: REDO?
+                await updateFolderCountNotes({variables: {folderid: idSelectedFolder, mode: "+"}}) // TODO: REDO?
             }
         }
 
 
-        navigate('../')
+        navigate(-1)
     }
 
     return (

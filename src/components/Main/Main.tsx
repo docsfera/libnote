@@ -8,7 +8,7 @@
 //     </main>
 // )
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useRef} from 'react';
 import "./Main.sass"
 import Header from "../Header/Header";
 import Folders from "../Folders/Folders"
@@ -40,30 +40,25 @@ const GET_ALL_NOTES = gql`
 `
 
 const Main = () => {
-
-
     const { loading, data, error, refetch} = useQuery(GET_ALL_NOTES, {variables: {userid: "1"}})
+    const smokeWindow = useRef<HTMLDivElement>(null)
+    useEffect(() => {
+        if(smokeWindow && smokeWindow.current){
+            smokeWindow.current.style.height = `${smokeWindow.current.ownerDocument.body.offsetHeight}px`
+        }
+    },[smokeWindow, smokeWindow.current])
 
-    useEffect(() => console.log("update"), [data])
+    useEffect(() => {}, [data])
     const numOfNotes: any = (data && data.getAllNotes) && data.getAllNotes.length
-
-
 
     //TODO: как типизировать data, data.getAllNotes?
     return (
         <div className="main">
+            <div ref={smokeWindow} className="smoke"> </div>
             <Header/>
-            <Folders numOfNotes={numOfNotes}/>
+            <Folders numOfNotes={numOfNotes} smokeWindow={smokeWindow}/>
             <NewBooks/>
             <NewNotes/>
-            {/*<LatestBooks/>*/}
-            {/*<InputNoteCreator refetch={refetch}/>*/}
-            {/*{!loading && data.getAllNotes.map((i:any) =>*/}
-            {/*    <Note noteContent={i.content}*/}
-            {/*          noteDate={i.dateupdate}*/}
-            {/*          noteId = {i.id}*/}
-            {/*          deleteNoteEvent={deleteNoteEvent}/>)*/}
-            {/*}*/}
         </div>
     );
 };
