@@ -1,5 +1,6 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react'
 import "./NewBooks.sass"
+import {NavLink} from "react-router-dom"
 
 const NewBooks = () => {
     let [position, setPosition] = useState(0)
@@ -54,7 +55,7 @@ const NewBooks = () => {
 
     return (
         <div className="folders-section" ref={imageSection}>
-            <p className="name-section">Книги</p>
+            <NavLink to="books" className="name-section">Книги</NavLink>
             <p className="section-count">Всего 8 книг</p>
             <div className="folders">
                 <button  className="min" onClick={min} ref={minBtn}/*disabled={minIsDisabled}*/> </button>

@@ -8,17 +8,29 @@ import Notes from "./components/Notes/Notes";
 import NoteCreator from "./components/NoteCreator/NoteCreator";
 import FolderNotes from "./components/FolderNotes/FolderNotes";
 import PdfViewer from "./components/PdfViewer/PdfViewer";
+import {gql, useQuery} from "@apollo/client";
 
+const GET_USER_BY_ID = gql`
+    query getUserById($id: ID) {
+        getAllFolders(id: $id){
+            id
+        }
+    }
+`
 
 function App() {
+    
+    const user = useQuery(GET_USER_BY_ID, {variables: {id: "1"}}).data
+    
+    
   return (
     <div className="App">
       <Aside/>
         <Routes>
             <Route path='/' element={<Main />}/>
-            <Route path='/books' element={<Books />}/>
+            <Route path='/books' element={<Books user={user}/>}/>
             <Route path='/notes' element={<Notes />}/>
-            <Route path='/pdf-viewer' element={<PdfViewer />}/>
+            <Route path='/pdf-viewer/:id' element={<PdfViewer />}/>
             <Route path='/note-creator' element={<NoteCreator />}/>
             <Route path='/note-creator/:id' element={<NoteCreator />}/>
             <Route path='/folder-notes/:id' element={<FolderNotes />}/>

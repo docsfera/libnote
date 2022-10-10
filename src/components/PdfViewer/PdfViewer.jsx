@@ -1,10 +1,13 @@
 import React, {useEffect, useRef} from 'react'
 import "./PdfViewer.sass"
+import {useLocation, useParams} from "react-router-dom";
 //import * as pdfDist from "pdfjs-dist"
 const pdfjsLib = require("pdfjs-dist/build/pdf")
 const pdfjsViewer = require("pdfjs-dist/web/pdf_viewer")
 
 const PdfViewer = () => {
+    const {id} = useParams()
+    const { state }: any = useLocation() //TODO: any
     const containerRef = useRef(null)
     const refPdfViewer = useRef(null)
 
@@ -19,8 +22,9 @@ const PdfViewer = () => {
         pdfjsLib.GlobalWorkerOptions.workerSrc = "https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.worker.min.js"
         const CMAP_URL = "node_modules/pdfjs-dist/cmaps/" //"pdfjs-dist/cmaps/"
         const CMAP_PACKED = true
-        let DEFAULT_URL = "somefile5.pdf"
-        //let DEFAULT_URL = `http://localhost:3000/somefile5.pdf`
+        //let DEFAULT_URL = "../../files/somefile5.pdf"
+        console.log(state.name, `http://localhost:3000/files/${id}/${state.name}`)
+        let DEFAULT_URL = `http://localhost:3000/files/${id}/${state.name}`
         const SEARCH_FOR = ""; // try 'Mozilla'
         const eventBus = new pdfjsViewer.EventBus()
 

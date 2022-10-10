@@ -2,13 +2,14 @@ import express from "express"
 import {graphqlHTTP} from "express-graphql"
 import cors from "cors"
 import {buildSchema} from "graphql"
-import fileUpload from "express-fileupload"
+import fileUpload, {UploadedFile} from "express-fileupload"
 import pg from "pg"
 import path from "path"
 
 
 //@ts-ignore
 import {createDir} from "./services/fileService.ts"
+import fs from "fs";
 
 const Pool = pg.Pool
 const pool = new Pool({
@@ -83,9 +84,10 @@ const schema = buildSchema(`
         getFolderById(id: ID): Folder
         getAllNotes(userid: ID): [Note]
         getAllFolders(userid: ID): [Folder]
+        getAllBooks(userid: ID): [Book]
         getNotesByFolder(folderid: ID): [Note] 
     }
-    
+    scalar Upload
     type Mutation {
         createFolder(input: FolderInput): Folder
         createBook(input: BookInput): Book
@@ -96,6 +98,8 @@ const schema = buildSchema(`
         updateFolderName(folderid: ID, name: String): Folder
         updateFolderCountNotes(folderid: ID, mode: String): Folder
         updateNote(input: NoteInput): Note
+        
+        downloadBook(file: Upload!) : Book
        
     }
 
@@ -132,6 +136,10 @@ const root = {
             .then(res => res.rows[0])
     ,
     getAllNotes: async ({userid}: any) => await pool.query('SELECT * FROM notes WHERE userid = ($1) ORDER BY dateupdate DESC'
+        , [+userid])
+        .then(res => res.rows)
+    ,
+    getAllBooks : async ({userid}: any) => await pool.query('SELECT * FROM books WHERE userid = ($1)'
         , [+userid])
         .then(res => res.rows)
     ,
@@ -187,24 +195,44 @@ const root = {
     getNotesByFolder: async ({folderid}: any) => await pool.query('SELECT * FROM notes WHERE folderid = ($1)'
         , [+folderid]).then(res => res.rows)
     ,
+
+    downloadBook: (file: UploadedFile | undefined, userId: string) => {
+        if (file){
+            console.log("gg")
+            const filePath = path.join('C:/Users/Admin/Desktop/libnote/public/files', userId)
+
+            try {
+                if(fs.existsSync(filePath)) {
+                    console.log('hh')
+                    file.mv(path.join('C:/Users/Admin/Desktop/libnote/public/files',userId, file.name))
+                    console.log('hh2')
+                    pool.query('INSERT INTO books (userid, name, image) VALUES ($1, $2, $3)', [userId, file.name, ""])
+                    console.log('hh3')
+                } else{
+                    fs.mkdirSync(filePath)
+                    console.log({message: "File already exist"})
+                }
+            } catch (e) {
+                console.log({message: "File error", e})
+            }
+        }else{
+            console.log('qq')
+        }
+    }
+    ,
+
+
 }
 
 
 
 
 app.post('/', function(req, res) {
-    //@ts-ignore
-    const file = req.files.file as UploadedFile
-    console.log(file)
-    createDir(file)
-    file.mv(path.join('C:/Users/Admin/Desktop/libnote/files', file.name), function(err: any) {
-        if (err) {
-            console.log(err);
-        }
-    });
+    const file = (req && req.files) && req.files.file as UploadedFile
+    const userId = req.body.text
+    //localStorage.setItem("userId", JSON.stringify(1))
 
-
-
+    root.downloadBook(file, userId)
 });
 
 app.use('/graphql', graphqlHTTP({
@@ -214,7 +242,7 @@ app.use('/graphql', graphqlHTTP({
     }
 ))
 
-app.set('port', process.env.PORT || 3002)
+app.set('port', process.env.PORT || 3001)
 
 const server = app.listen(app.get('port'), function() {
     console.log('listening');

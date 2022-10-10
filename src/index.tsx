@@ -9,7 +9,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider, gql } from "@apollo/client
 import './fonts/RFDewiExtended/RFDewiExtended-Bold.woff2';
 
 const client = new ApolloClient({
-    uri: 'http://localhost:3002/graphql',
+    uri: 'http://localhost:3001/graphql',
     cache: new InMemoryCache(),
 });
 
