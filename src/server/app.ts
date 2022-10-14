@@ -86,6 +86,8 @@ const schema = buildSchema(`
         getAllFolders(userid: ID): [Folder]
         getAllBooks(userid: ID): [Book]
         getNotesByFolder(folderid: ID): [Note] 
+        
+        
     }
     scalar Upload
     type Mutation {
@@ -94,12 +96,14 @@ const schema = buildSchema(`
         createUser(input: UserInput): User
         createNote(input: NoteInput): Note
         deleteNoteById(noteid: ID): Note
+        deleteBookById(id: ID): Book
         deleteFolderById(id: ID): Folder
         updateFolderName(folderid: ID, name: String): Folder
         updateFolderCountNotes(folderid: ID, mode: String): Folder
         updateNote(input: NoteInput): Note
         
         downloadBook(file: Upload!) : Book
+        saveBase64(base64: String, bookId: ID): Book
        
     }
 
@@ -108,6 +112,9 @@ const schema = buildSchema(`
 const app = express()
 app.use(cors())
 app.use(fileUpload())
+
+app.use(express.json({limit: '25mb'}));
+app.use(express.urlencoded({limit: '25mb'}));
 
 const root = {
 
@@ -147,6 +154,11 @@ const root = {
             , [+noteid])
             .then(res => res.rows[0])
     ,
+    deleteBookById: async ({id}: any) => await pool.query('DELETE FROM books WHERE id = ($1) RETURNING *'
+        , [+id])
+        .then(res => res.rows[0])
+    ,
+
     deleteFolderById: async ({id}: any) => { //TODO: doent send response
         await pool.query('UPDATE notes SET folderid = null WHERE folderid = ($1)', [+id])
             .then(() => pool.query('DELETE FROM folders WHERE id = ($1) RETURNING *'
@@ -198,7 +210,7 @@ const root = {
 
     downloadBook: (file: UploadedFile | undefined, userId: string) => {
         if (file){
-            console.log("gg")
+            console.log("gg", file, userId)
             const filePath = path.join('C:/Users/Admin/Desktop/libnote/public/files', userId)
 
             try {
@@ -218,6 +230,32 @@ const root = {
         }else{
             console.log('qq')
         }
+
+    }
+    ,
+
+    saveBase64: async (base64: string, bookId: any) => {
+        //@ts-ignore
+        let base64Data = base64.base64.replace(/^data:image\/png;base64,/, "")
+
+        const getNameImg = () => {
+            return `${Math.floor(Math.random() * 1e10)}.png`
+        }
+        let imgName = getNameImg()
+        console.log(imgName, bookId.body.variables.bookId) // TODO: crinjahgdfh
+        let isFileExist = true
+        let filePath = path.join('C:/Users/Admin/Desktop/libnote/public/files/1', imgName)
+        while (isFileExist) {
+            if (fs.existsSync(filePath)){
+                imgName = getNameImg()
+            }else {
+                isFileExist = false
+                fs.writeFileSync(filePath, base64Data, 'base64')
+            }
+        }
+        await pool.query('UPDATE books SET image = ($2) WHERE id = ($1) RETURNING *'
+            , [+bookId.body.variables.bookId, imgName])
+            .then(res => res.rows[0])
     }
     ,
 
@@ -229,7 +267,8 @@ const root = {
 
 app.post('/', function(req, res) {
     const file = (req && req.files) && req.files.file as UploadedFile
-    const userId = req.body.text
+    const userId = req.body.userId
+    console.log(file, userId)
     //localStorage.setItem("userId", JSON.stringify(1))
 
     root.downloadBook(file, userId)

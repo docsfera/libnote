@@ -7,7 +7,7 @@ const pdfjsViewer = require("pdfjs-dist/web/pdf_viewer")
 
 const PdfViewer = () => {
     const {id} = useParams()
-    const { state }: any = useLocation() //TODO: any
+    const { state } = useLocation() //TODO: any
     const containerRef = useRef(null)
     const refPdfViewer = useRef(null)
 
@@ -77,13 +77,15 @@ const PdfViewer = () => {
             pdfLinkService.setDocument(pdfDocument, null)
 
             let numPages = pdfDocument.numPages // кол-во страниц
-            console.log(numPages)
 
-            // pdfDocument.getPage(1).then(function (page) {
-            //     console.log(page)
-            // })
+            pdfDocument.getPage(1).then(function (page) {
+                console.log(page)
+
+            })
 
         });
+
+
 
 
 
