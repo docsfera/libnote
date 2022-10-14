@@ -3,7 +3,7 @@ import Folder from "../Folder/Folder"
 import Arrow from "../Arrow/Arrow"
 import "./Folders.sass"
 import {gql, useMutation, useQuery} from "@apollo/client";
-import {useNavigate} from "react-router-dom"
+import {NavLink, useNavigate} from "react-router-dom"
 
 const GET_ALL_FOLDERS = gql`
     query getAllFolders($userid: ID) {
@@ -128,7 +128,7 @@ const Folders: React.FC<FoldersType> = (props) => {
 
             <div className="folders-wrapper">
                 <div className="folders-info">
-                    <p className="name-section">Папки</p>
+                    <NavLink to="folders" className="name-section">Папки</NavLink>
                     <p className="section-count">{`Всего ${folderCount} папок`}</p>
                 </div>
                 <div className="create-folder" onClick={showCreateFolderWindow}>

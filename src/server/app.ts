@@ -81,6 +81,7 @@ const schema = buildSchema(`
         getAllUsers: [User]
         getNoteById(id: ID): Note
         getUserById(id: ID): User
+        getBookById(id: ID): Book
         getFolderById(id: ID): Folder
         getAllNotes(userid: ID): [Note]
         getAllFolders(userid: ID): [Folder]
@@ -98,7 +99,7 @@ const schema = buildSchema(`
         deleteNoteById(noteid: ID): Note
         deleteBookById(id: ID): Book
         deleteFolderById(id: ID): Folder
-        updateFolderName(folderid: ID, name: String): Folder
+        updateFolderName(id: ID, name: String): Folder
         updateFolderCountNotes(folderid: ID, mode: String): Folder
         updateNote(input: NoteInput): Note
         
@@ -128,6 +129,11 @@ const root = {
     getNoteById: async ({id}: any) => await pool.query('SELECT * FROM notes WHERE id = ($1)'
     , [id])
     .then(res => res.rows[0])
+    ,
+    getBookById: async ({id}: any) => await pool.query('SELECT * FROM books WHERE id = ($1)'
+        , [id])
+        .then(res => res.rows[0])
+
     ,
     getFolderById: async ({id}: any) => await pool.query('SELECT * FROM folders WHERE id = ($1)'
         , [id])
@@ -176,9 +182,9 @@ const root = {
         , [input.userid, input.name, input.countofnotes])
         .then(res => res.rows[0])
     ,
-    updateFolderName: async ({folderid, name}: any) => await pool.query('UPDATE folders SET name = ($1) WHERE id = ($2) RETURNING *'
-        , [name, folderid])
-        .then(res => res.rows[0])
+    updateFolderName: async ({id, name}: any) => await pool.query('UPDATE folders SET name = ($1) WHERE id = ($2) RETURNING *'
+        , [name, id])
+        .then(res => {res.rows[0]; console.log(name, id)})
     ,
     updateNote: async ({input}: any) => await pool.query('UPDATE notes SET folderid = ($2), bookid = ($3), title = ($4), content = ($5), datecreate = ($6), dateupdate = ($7) WHERE id = ($1) RETURNING *'
     , [input.id, input.folderid, input.bookid, input.title, input.content, input.datecreate, input.dateupdate])
@@ -210,16 +216,12 @@ const root = {
 
     downloadBook: (file: UploadedFile | undefined, userId: string) => {
         if (file){
-            console.log("gg", file, userId)
             const filePath = path.join('C:/Users/Admin/Desktop/libnote/public/files', userId)
 
             try {
                 if(fs.existsSync(filePath)) {
-                    console.log('hh')
                     file.mv(path.join('C:/Users/Admin/Desktop/libnote/public/files',userId, file.name))
-                    console.log('hh2')
                     pool.query('INSERT INTO books (userid, name, image) VALUES ($1, $2, $3)', [userId, file.name, ""])
-                    console.log('hh3')
                 } else{
                     fs.mkdirSync(filePath)
                     console.log({message: "File already exist"})
@@ -268,7 +270,6 @@ const root = {
 app.post('/', function(req, res) {
     const file = (req && req.files) && req.files.file as UploadedFile
     const userId = req.body.userId
-    console.log(file, userId)
     //localStorage.setItem("userId", JSON.stringify(1))
 
     root.downloadBook(file, userId)

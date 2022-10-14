@@ -37,7 +37,7 @@ const SAVE_BASE_64 = gql`
     mutation($base64: String, $bookId: ID){
         saveBase64(base64: $base64, bookId: $bookId) {
             id
-            
+
         }
     }
 
@@ -59,7 +59,6 @@ const Books: React.FC<BooksType> = (props) => {
             data.getAllBooks.map((i: any, index: any) => {
                 if (!i.image) {
                     let bookUrl = `http://localhost:3000/files/1/${i.name}`
-
                     setCanvas(refCanvas, bookUrl, i.id)
                 }
             })
@@ -67,35 +66,23 @@ const Books: React.FC<BooksType> = (props) => {
     }, [data, refCanvas])
 
     const setCanvas = (refCanvas: any, bookUrl: string, bookId: string) => {
-        //console.log('here', bookId)
+
         pdfjsLib.GlobalWorkerOptions.workerSrc = "https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.worker.min.js"
         let loadingTask = pdfjsLib.getDocument(bookUrl)
 
         loadingTask.promise.then((pdfDocument: any) => {
-            //console.log('here1')
             pdfDocument.getPage(1).then((page: any) => {
-                //console.log('here2')
                 let scale = 555
                 let viewport = page.getViewport(scale)
                 let canvas = refCanvas.current
                 if (canvas) {
-                    //console.log('here3')
                     let context = canvas.getContext('2d');
-                    // context.scale(1, -1);
-                    // context.translate(0, -canvas.height);
-                    //contexts.push(context)
-
                     viewport.height = canvas.height
                     viewport.width = canvas.width
+                    let renderContext = {canvasContext: context, viewport: viewport}
+                    let renderTask = page.render(renderContext)
 
-                    let renderContext = {
-                        canvasContext: context,
-                        viewport: viewport
-                    }
-
-                    let renderTask = page.render(renderContext);
                     renderTask.promise.then(async () => {
-                        //console.log('Page rendered')
                         let base64image = canvas.toDataURL("image/png")
                         await saveBase64({variables: {base64: base64image, bookId: bookId} })
                         // html2canvas(document.getElementById("pageContainer")).then((canvas) => {
@@ -112,24 +99,15 @@ const Books: React.FC<BooksType> = (props) => {
         console.log(file)
         await mut({variables: {file} })
     }, [])
-    const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
-
-    // @ts-ignore
-
-    function onChange(e) {
-        const file = e.target.files[0]
-        mut({variables: {file} })
-    }
 
     const pimp = (name: string) => {
-        navigate('../pdf-viewer/1', {state: {name}})
+        navigate('../pdf-viewer/1', {state: {name}}) // TODO: useQuery(getBookByID)???
     }
 
     const uploadFile = (file: any) => {
         let formData = new FormData()
         formData.append('file', file)
         formData.append('userId', "1")
-        console.log(file)
         fetch('/', {
             method: 'POST',
             body: formData

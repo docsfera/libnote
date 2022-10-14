@@ -1,5 +1,6 @@
 import React, {useRef} from 'react'
 import "./Book.sass"
+import {image} from "html2canvas/dist/types/css/types/image";
 
 type BookType = {
     name: string
@@ -19,7 +20,10 @@ const Book: React.FC<BookType> = (props) => {
 
     return (
         <div className="book" onClick={() => props.pimp(props.name)}>
-            <img src={`/files/1/${props.imageName}`} alt="" className="image"/>
+            {props.imageName
+                ? <img src={`/files/1/${props.imageName}`} alt="" className="image"/>
+                : <div className="empty-image"> </div>}
+
             <p className="book-name">{props.name}</p>
         </div>
     );

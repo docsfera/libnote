@@ -1,15 +1,28 @@
 import React, {useEffect, useRef} from 'react'
 import "./PdfViewer.sass"
 import {useLocation, useParams} from "react-router-dom";
+import {gql, useQuery} from "@apollo/client";
 //import * as pdfDist from "pdfjs-dist"
 const pdfjsLib = require("pdfjs-dist/build/pdf")
 const pdfjsViewer = require("pdfjs-dist/web/pdf_viewer")
+
+
+const GET_BOOK_BY_ID = gql`
+    query getBookById($id: ID){
+        getBookById(id: $id){
+            id
+         
+        }
+    }
+`
+
 
 const PdfViewer = () => {
     const {id} = useParams()
     const { state } = useLocation() //TODO: any
     const containerRef = useRef(null)
     const refPdfViewer = useRef(null)
+    //const {data} = useQuery(GET_BOOK_BY_ID, {variables: {id}} )
 
     useEffect(() => {
         //window.addEventListener('scroll', scrollEvent) // срабатывал event при переходе на main
@@ -23,7 +36,7 @@ const PdfViewer = () => {
         const CMAP_URL = "node_modules/pdfjs-dist/cmaps/" //"pdfjs-dist/cmaps/"
         const CMAP_PACKED = true
         //let DEFAULT_URL = "../../files/somefile5.pdf"
-        console.log(state.name, `http://localhost:3000/files/${id}/${state.name}`)
+        //console.log((data && data.getBookById) && `http://localhost:3000/files/${id}/${data.getBookById.name}`)
         let DEFAULT_URL = `http://localhost:3000/files/${id}/${state.name}`
         const SEARCH_FOR = ""; // try 'Mozilla'
         const eventBus = new pdfjsViewer.EventBus()

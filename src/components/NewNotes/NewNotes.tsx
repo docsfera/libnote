@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import "./NewNotes.sass"
 import {gql, useMutation, useQuery} from "@apollo/client"
-import { useNavigate } from "react-router-dom"
+import {NavLink, useNavigate} from "react-router-dom"
 import Note from "../Note/Note"
 
 const GET_ALL_NOTES = gql`
@@ -59,7 +59,7 @@ const NewNotes = () => {
         <div className="notes-section">
             <div className="notes-wrapper">
                 <div className="notes-info">
-                    <p className="name-section">Заметки</p>
+                    <NavLink to="notes" className="name-section">Заметки</NavLink>
                     <p className="section-count">{`Всего ${data ? data.getAllNotes.length : "0"} заметок`}</p>
                 </div>
                 <div className="create-note" onClick={() => goToNoteCreator()}>
@@ -70,6 +70,7 @@ const NewNotes = () => {
             <div className="notes">
                 {data
                     ? data.getAllNotes.map((i: any) => <Note noteId={i.id}
+                                                             key={i.id}
                                                              folderId={i.folderid}
                                                              noteContent={i.content}
                                                              dateUpdate={i.dateupdate}
