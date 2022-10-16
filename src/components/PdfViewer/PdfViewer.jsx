@@ -1,11 +1,13 @@
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import "./PdfViewer.sass"
 import {useLocation, useParams} from "react-router-dom";
 import {gql, useQuery} from "@apollo/client";
-//import * as pdfDist from "pdfjs-dist"
+
+
+import "./pdf_viewer.css"
+import NoteCreatorComponent from "../NoteCreatorComponent/NoteCreatorComponent";
 const pdfjsLib = require("pdfjs-dist/build/pdf")
 const pdfjsViewer = require("pdfjs-dist/web/pdf_viewer")
-
 
 const GET_BOOK_BY_ID = gql`
     query getBookById($id: ID){
@@ -20,8 +22,13 @@ const GET_BOOK_BY_ID = gql`
 const PdfViewer = () => {
     const {id} = useParams()
     const { state } = useLocation() //TODO: any
+
+    const [isShowAside, setIsShowAside] = useState(false)
+    const [isShowNoteCreator, setIsShowNoteCreator] = useState(false)
+
     const containerRef = useRef(null)
     const refPdfViewer = useRef(null)
+
     //const {data} = useQuery(GET_BOOK_BY_ID, {variables: {id}} )
 
     useEffect(() => {
@@ -86,15 +93,74 @@ const PdfViewer = () => {
             // Document loaded, specifying document for the viewer and
             // the (optional) linkService.
             pdfViewer.setDocument(pdfDocument)
-
             pdfLinkService.setDocument(pdfDocument, null)
 
             let numPages = pdfDocument.numPages // кол-во страниц
 
-            pdfDocument.getPage(1).then(function (page) {
-                console.log(page)
+            // pdfjsLib.renderTextLayer({
+            //     textContent: textContent,
+            //     container: $("#text-layer").get(0),
+            //     viewport: viewport,
+            //     textDivs: []
+            // })
 
+            pdfDocument.getPage(1).then(function (page) {
+                let scale = 1.5;
+                let viewport = page.getViewport(scale);
+
+                // console.log("here")
+                //
+                // textLayer.current.style.height = `${viewport.height}px`
+                // textLayer.current.style.width = `${viewport.width}px`
+                //     height : viewport.height+'px',
+                //     width : viewport.width+'px',
+                //     top : canvasOffset.top,
+                //     left : canvasOffset.left
+                // });
+
+                page.getTextContent().then(function(textContent){
+
+
+
+                    console.log(page.getTextContent())
+                    // if(textLayer2 && textLayer2.current){
+                    //     let textLayer = new TextLayerBuilder({
+                    //         eventBus: eventBus,
+                    //         textLayerDiv: textLayer2.current,
+                    //         pageIndex: 1,
+                    //         viewport: viewport
+                    //     });
+                    //
+                    //     // Set text-fragments
+                    //     textLayer.setTextContent(textContent);
+                    //
+                    //     // Render text-fragments
+                    //     textLayer.render();
+                    //
+                    // }
+
+
+
+
+                    // console.log(textContent)
+                    //
+                    // pdfjsLib.renderTextLayer({
+                    //     textContent: textContent,
+                    //     container: textLayer.current,
+                    //     viewport: viewport,
+                    //     textDivs: []
+                    // });
+
+                    // let textLayer = new TextLayerBuilder({
+                    //     viewport : viewport
+                    // });
+                    // console.log(textContent)
+                    // textLayer.setTextContent(textContent);
+                    // textLayer.render();
+
+                })
             })
+
 
         });
 
@@ -107,10 +173,21 @@ const PdfViewer = () => {
 
 
 
+
     return (
-        <div ref={containerRef} id="viewerContainer">
-            <div id="pageContainer" className="pdfViewer"></div>
-        </div>
+        <>
+            <div ref={containerRef} id="viewerContainer">
+                <div id="pageContainer" className="pdfViewer"></div>
+            </div>
+
+            <div className="exit fixed-button" onClick={() => setIsShowAside(!isShowAside)}>1</div>
+            <div className="getter-aside fixed-button">1</div>
+            <div className="getter-note-creator fixed-button" onClick={() => setIsShowNoteCreator(!isShowNoteCreator)}>1</div>
+
+            {isShowAside && <aside className="book-aside"></aside>}
+            {isShowNoteCreator && <NoteCreatorComponent/>}
+
+        </>
     );
 };
 

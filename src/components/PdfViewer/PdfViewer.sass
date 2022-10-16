@@ -1,18 +1,34 @@
-.tooltip
-  display: none
-  padding: 15px
-  position: absolute
-  background: #000
-  width: 3vw
-  height: 7vh
-  border-radius: 4px
-  color: #fff
-  z-index: 9999
 #viewerContainer
   width: 100%
   position: absolute
   background: #333333
+  z-index: 2
+
   #pageContainer
     display: flex
     flex-direction: column
     align-items: center
+.book-aside
+  z-index: 4 //TODO: preventDefault() !
+  position: fixed
+  right: 0
+  height: 100vh
+  width: 250px
+  background: green
+.fixed-button
+  position: fixed
+  z-index: 3
+  width: 40px
+  height: 40px
+  background: red
+.exit
+  left: 20px
+  top: 20px
+.getter-aside
+  right: 20px
+  top: 20px
+.getter-note-creator
+  right: 20px
+  bottom: 20px
+  background: green
+

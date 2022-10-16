@@ -55,7 +55,7 @@ const Main = () => {
     return (
         <div className="main">
             <div ref={smokeWindow} className="smoke"> </div>
-            <Header/>
+
             <Folders numOfNotes={numOfNotes} smokeWindow={smokeWindow}/>
             <NewBooks/>
             <NewNotes/>

@@ -9,6 +9,7 @@ import NoteCreator from "./components/NoteCreator/NoteCreator";
 import FolderNotes from "./components/FolderNotes/FolderNotes";
 import PdfViewer from "./components/PdfViewer/PdfViewer";
 import {gql, useQuery} from "@apollo/client";
+import Header from "./components/Header/Header";
 
 const GET_USER_BY_ID = gql`
     query getUserById($id: ID) {
@@ -26,6 +27,7 @@ function App() {
   return (
     <div className="App">
       <Aside/>
+      <Header/>
         <Routes>
             <Route path='/' element={<Main />}/>
             <Route path='/books' element={<Books user={user}/>}/>

@@ -166,7 +166,7 @@ const NoteCreator = () => {
 
     return (
         <div className="note-creator-wrapper">
-            <Header/>
+            {/*<Header/>*/}
             <div className="note-creator">
                 <div className="note-info">
 
