@@ -53,13 +53,17 @@ const Main = () => {
 
     //TODO: как типизировать data, data.getAllNotes?
     return (
-        <div className="main">
-            <div ref={smokeWindow} className="smoke"> </div>
+        <div>
+            <Header/>
+            <div className="main">
+                <div ref={smokeWindow} className="smoke"> </div>
 
-            <Folders numOfNotes={numOfNotes} smokeWindow={smokeWindow}/>
-            <NewBooks/>
-            <NewNotes/>
+                <Folders numOfNotes={numOfNotes} smokeWindow={smokeWindow}/>
+                <NewBooks/>
+                <NewNotes/>
+            </div>
         </div>
+
     );
 };
 

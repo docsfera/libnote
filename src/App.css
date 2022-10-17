@@ -14,4 +14,20 @@ p{
 .App{
   display: grid;
   grid-template-columns: 1fr 4fr;
+
+  /*grid-template-areas:*/
+  /*        "A A B B   B B B B   B B B B"*/
+  /*        "A A C C   C C C C   C C C C"*/
+  /*        "A A C C   C C C C   C C C C"*/
+  /*        "A A C C   C C C C   C C C C"*/
+
+  /*        "A A C C   C C C C   C C C C"*/
+  /*        "A A C C   C C C C   C C C C"*/
+  /*        "A A C C   C C C C   C C C C"*/
+  /*        "A A C C   C C C C   C C C C"*/
+
+  /*        "A A C C   C C C C   C C C C"*/
+  /*        "A A C C   C C C C   C C C C"*/
+  /*        "A A C C   C C C C   C C C C"*/
+  /*        "A A C C   C C C C   C C C C";*/
 }

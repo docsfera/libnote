@@ -38,7 +38,7 @@ const NewBooks = () => {
                     currentSection={bookSection}
                     sectionCount={bookCount}
                     isLeftArrow={true}
-                    maxCountToShow={6}
+                    maxCountToShow={1}
                     />
 
                 <div className="folders-container">
@@ -59,7 +59,7 @@ const NewBooks = () => {
                        currentSection={bookSection}
                        sectionCount={bookCount}
                        isLeftArrow={false}
-                       maxCountToShow={6}
+                       maxCountToShow={1}
                 />
             </div>
         </div>

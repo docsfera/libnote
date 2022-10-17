@@ -21,7 +21,7 @@ const Notes = () => {
     return (
         <div className="notes">
             <Header/>
-            <InputNoteCreator/>
+            {/*<InputNoteCreator/>*/}
         </div>
     );
 };

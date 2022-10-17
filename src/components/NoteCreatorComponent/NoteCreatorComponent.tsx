@@ -5,7 +5,7 @@ import NoteCreator from "../NoteCreator/NoteCreator";
 const NoteCreatorComponent = () => {
     return (
         <div className="note-creator-component">
-            <NoteCreator/>
+            <NoteCreator isShowHeader={false}/>
         </div>
     );
 };

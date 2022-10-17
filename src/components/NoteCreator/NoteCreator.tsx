@@ -55,8 +55,12 @@ const UPDATE_FOLDER_COUNT_NOTES = gql`
 //     id ? useQuery(GET_NOTE_BY_ID, {variables: {id}}).data : {}
 // }
 
+type NoteCreatorType = {
+    isShowHeader?: boolean
+}
 
-const NoteCreator = () => {
+
+const NoteCreator: React.FC<NoteCreatorType> = (props) => {
     const navigate = useNavigate()
     const {id} = useParams()
     const { state }: any = useLocation() //TODO: any
@@ -166,7 +170,7 @@ const NoteCreator = () => {
 
     return (
         <div className="note-creator-wrapper">
-            {/*<Header/>*/}
+            {!(props.isShowHeader === false) && <Header/>}
             <div className="note-creator">
                 <div className="note-info">
 
