@@ -1,7 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react'
 import "./PdfViewer.sass"
-import {useLocation, useParams} from "react-router-dom";
+import {useLocation, useParams, useNavigate} from "react-router-dom";
 import {gql, useQuery} from "@apollo/client";
+import * as cn from "classnames"
 
 
 import "./pdf_viewer.css"
@@ -20,14 +21,18 @@ const GET_BOOK_BY_ID = gql`
 
 
 const PdfViewer = () => {
-    const {id} = useParams()
+    const navigate = useNavigate()
+    const {userId} = useParams()
     const { state } = useLocation() //TODO: any
 
     const [isShowAside, setIsShowAside] = useState(false)
     const [isShowNoteCreator, setIsShowNoteCreator] = useState(false)
 
+    const [currentNoteContent, setCurrentNoteContent] = useState({name: "name", content: "content"})
+
     const containerRef = useRef(null)
     const refPdfViewer = useRef(null)
+    const [isShowSmokeWindow, setIsShowSmokeWindow] = useState(false)
 
     //const {data} = useQuery(GET_BOOK_BY_ID, {variables: {id}} )
 
@@ -44,7 +49,7 @@ const PdfViewer = () => {
         const CMAP_PACKED = true
         //let DEFAULT_URL = "../../files/somefile5.pdf"
         //console.log((data && data.getBookById) && `http://localhost:3000/files/${id}/${data.getBookById.name}`)
-        let DEFAULT_URL = `http://localhost:3000/files/${id}/${state.name}`
+        let DEFAULT_URL = `http://localhost:3000/files/${userId}/${state.name}`
         const SEARCH_FOR = ""; // try 'Mozilla'
         const eventBus = new pdfjsViewer.EventBus()
 
@@ -171,21 +176,47 @@ const PdfViewer = () => {
 
     }, [containerRef])
 
+    const getAsideEvent = () => {
+
+
+
+        // if(getterAside && getterAside.current) {
+        //     if(getterAside.current.style.right === "20px"){
+        //         getterAside.current.style.right = "100px"
+        //     }else{
+        //         getterAside.current.style.right = "20px"
+        //     }
+        //
+        // }
+    }
+
 
 
 
     return (
         <>
+
             <div ref={containerRef} id="viewerContainer">
                 <div id="pageContainer" className="pdfViewer"></div>
             </div>
 
-            <div className="exit fixed-button" onClick={() => setIsShowAside(!isShowAside)}>1</div>
-            <div className="getter-aside fixed-button">1</div>
-            <div className="getter-note-creator fixed-button" onClick={() => setIsShowNoteCreator(!isShowNoteCreator)}>1</div>
+            <div className="exit fixed-button" onClick={() => navigate(-1)}> </div>
+            <div className={cn("getter-aside", "fixed-button", {"getter-aside-active": isShowAside})}
+                 onClick={() => setIsShowAside(!isShowAside)}> </div>
+            .book-aside-active
+            <div className="getter-note-creator fixed-button" onClick={() => {
+                setIsShowNoteCreator(!isShowNoteCreator)
+                setIsShowSmokeWindow(!isShowSmokeWindow)
+            }}>
+                <img src="../../../images/PdfNote.png" alt=""/>
 
-            {isShowAside && <aside className="book-aside"></aside>}
-            {isShowNoteCreator && <NoteCreatorComponent/>}
+            </div>
+
+            <aside className={cn("book-aside", {"book-aside-active": isShowAside})}> </aside>
+            {isShowNoteCreator && <NoteCreatorComponent id={userId}
+                                                        currentNoteContent={currentNoteContent}
+                                                        setCurrentNoteContent={setCurrentNoteContent}/>}
+            {isShowSmokeWindow && <div className="smoke"> </div>}
 
         </>
     );

@@ -9,26 +9,57 @@
     flex-direction: column
     align-items: center
 .book-aside
+  transition: 1s
   z-index: 4 //TODO: preventDefault() !
   position: fixed
-  right: 0
+  right: -250px
   height: 100vh
   width: 250px
   background: green
+.book-aside-active
+  right: 0
 .fixed-button
+  cursor: pointer
   position: fixed
   z-index: 3
   width: 40px
   height: 40px
   background: red
+  border-radius: 100%
 .exit
+  width: 20px
+  height: 20px
   left: 20px
   top: 20px
+  background: url("../../../public/images/exitIcon.svg") center no-repeat
 .getter-aside
+  z-index: 44
+  transition: 1s
   right: 20px
   top: 20px
+
+.getter-aside-active
+  right: 190px
+
 .getter-note-creator
-  right: 20px
+  transition: .5s
+  display: flex
+  justify-content: center
+  align-items: center
+  width: 60px
+  height: 60px
+  right: 40px
   bottom: 20px
-  background: green
+  background: #535353
+  &:hover
+    background: #737373
+    transform: scale(1.1)
+.smoke
+  position: absolute
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+  z-index: 2
+  background: rgba(35, 35, 35, 0.8)
 

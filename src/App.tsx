@@ -32,7 +32,7 @@ function App() {
             <Route path='/' element={<Main />}/>
             <Route path='/books' element={<Books user={user}/>}/>
             <Route path='/notes' element={<Notes />}/>
-            <Route path='/pdf-viewer/:id' element={<PdfViewer />}/>
+            <Route path='/pdf-viewer/:userId' element={<PdfViewer />}/>
             <Route path='/note-creator' element={<NoteCreator />}/>
             <Route path='/note-creator/:id' element={<NoteCreator />}/>
             <Route path='/folder-notes/:id' element={<FolderNotes />}/>
