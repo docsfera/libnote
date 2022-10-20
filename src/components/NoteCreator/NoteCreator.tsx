@@ -59,8 +59,8 @@ const UPDATE_FOLDER_COUNT_NOTES = gql`
 
 type NoteCreatorType = {
     isShowHeader?: boolean
-    currentNoteContent?: any
-    setCurrentNoteContent?: any
+    currentNoteData?: any
+    setCurrentNoteData?: any
 }
 
 const NoteCreator: React.FC<NoteCreatorType> = (props) => {
@@ -101,12 +101,16 @@ const NoteCreator: React.FC<NoteCreatorType> = (props) => {
             data.getNoteById.folderid && setNameSelectedFolder(allFolders.getAllFolders.filter((i: any) =>
                 (i.id === data.getNoteById.folderid))[0].name)
             data.getNoteById.bookid && setNameSelectedBook(dataBooks.getAllBooks.filter((i: any) =>
-                (i.id === data.getNoteById.bookid))[0].name);
+                (i.id === data.getNoteById.bookid))[0].name)
 
-
-            if(dataBooks && dataBooks.getAllBooks && idSelectedBook) {
-                setPathToImageSelectedBook(
+            // idSelectedBook не сразу устанавливается
+            if(dataBooks && dataBooks.getAllBooks && (idSelectedBook || data.getNoteById.bookid)) {
+                idSelectedBook
+                    ? setPathToImageSelectedBook(
                     `/files/1/${dataBooks.getAllBooks.filter((i:any) => i.id === idSelectedBook)[0].image}`)
+                    : setPathToImageSelectedBook(
+                    `/files/1/${dataBooks.getAllBooks.filter((i:any) => i.id === data.getNoteById.bookid)[0].image}`)
+
             }
         }
         // Если обрабатывается заметка созданная из папки
@@ -118,14 +122,21 @@ const NoteCreator: React.FC<NoteCreatorType> = (props) => {
 
         }
         // Если обрабатывается заметка pdfViewer
-        if(props.currentNoteContent){
-            setNoteName(props.currentNoteContent.name)
-            setNoteContent(props.currentNoteContent.content)
-
+        if(props.currentNoteData){
+            setNoteName(props.currentNoteData.name)
+            setNoteContent(props.currentNoteData.content)
+            setIdSelectedBook(props.currentNoteData.bookId)
+            setIdSelectedFolder(props.currentNoteData.folderId)
+            // НЕТ ЗАПРОСА!
+            //TODO: duplicate code
+            // data.getNoteById.folderid && setNameSelectedFolder(allFolders.getAllFolders.filter((i: any) =>
+            //     (i.id === props.currentNoteData.folderId))[0].name)
+            // data.getNoteById.bookid && setNameSelectedBook(dataBooks.getAllBooks.filter((i: any) =>
+            //     (i.id === props.currentNoteData.bookId))[0].name)
 
         }
 
-    }, [data, dataBooks])
+    }, [data, props.currentNoteData])
 
     const showAllFolder = () => {
         if(allFolder && allFolder.current) {
@@ -235,12 +246,12 @@ const NoteCreator: React.FC<NoteCreatorType> = (props) => {
 
                     <p className="note-name" contentEditable="true" onBlur={(e) => {
                         setNoteName(e.target.innerText)
-                        props.setCurrentNoteContent({name: e.target.innerText, content: props.currentNoteContent.content})
+                        props.setCurrentNoteData({name: e.target.innerText, content: props.currentNoteData.content})
                     }}>{reductStr(noteName)}</p>
                     <div className="note-content" contentEditable="true"
                          onBlur={(e) => {
                              setNoteContent(e.target.innerText)
-                             props.setCurrentNoteContent({name: props.currentNoteContent.name, content: e.target.innerText})
+                             props.setCurrentNoteData({name: props.currentNoteData.name, content: e.target.innerText})
                          }}>
                         {reductStr(noteContent)}
                     </div>

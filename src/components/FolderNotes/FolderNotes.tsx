@@ -10,6 +10,7 @@ const GET_NOTES_BY_FOLDER = gql`
         getNotesByFolder(folderid: $folderid) {
             id
             title
+            
             content
             dateupdate
         }

@@ -10,6 +10,7 @@ const GET_ALL_NOTES = gql`
             id
             title
             folderid
+            bookid
             content
             dateupdate
         }
@@ -72,6 +73,7 @@ const NewNotes = () => {
                     ? data.getAllNotes.map((i: any) => <Note noteId={i.id}
                                                              key={i.id}
                                                              folderId={i.folderid}
+                                                             bookId={i.bookid}
                                                              noteContent={i.content}
                                                              dateUpdate={i.dateupdate}
                                                              deleteNoteEvent={deleteNoteEvent}

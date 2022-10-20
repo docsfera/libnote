@@ -7,6 +7,7 @@ import * as cn from "classnames"
 
 import "./pdf_viewer.css"
 import NoteCreatorComponent from "../NoteCreatorComponent/NoteCreatorComponent";
+import PdfAside from "../PdfAside/PdfAside";
 const pdfjsLib = require("pdfjs-dist/build/pdf")
 const pdfjsViewer = require("pdfjs-dist/web/pdf_viewer")
 
@@ -28,7 +29,7 @@ const PdfViewer = () => {
     const [isShowAside, setIsShowAside] = useState(false)
     const [isShowNoteCreator, setIsShowNoteCreator] = useState(false)
 
-    const [currentNoteContent, setCurrentNoteContent] = useState({name: "name", content: "content"})
+    const [currentNoteData, setCurrentNoteData] = useState({name: "name", content: "content", bookId: undefined, folderId: undefined})
 
     const containerRef = useRef(null)
     const refPdfViewer = useRef(null)
@@ -191,8 +192,6 @@ const PdfViewer = () => {
     }
 
 
-
-
     return (
         <>
 
@@ -212,10 +211,18 @@ const PdfViewer = () => {
 
             </div>
 
-            <aside className={cn("book-aside", {"book-aside-active": isShowAside})}> </aside>
+            <PdfAside isShowAside={isShowAside}
+                      isShowNoteCreator={isShowNoteCreator}
+                      isShowSmokeWindow={isShowSmokeWindow}
+                      setIsShowAside={setIsShowAside}
+                      setIsShowNoteCreator={setIsShowNoteCreator}
+                      setCurrentNoteData={setCurrentNoteData}
+                      setIsShowSmokeWindow={setIsShowSmokeWindow}/>
+
             {isShowNoteCreator && <NoteCreatorComponent id={userId}
-                                                        currentNoteContent={currentNoteContent}
-                                                        setCurrentNoteContent={setCurrentNoteContent}/>}
+                                                        currentNoteData={currentNoteData}
+                                                        setCurrentNoteData={setCurrentNoteData}
+                                                        />}
             {isShowSmokeWindow && <div className="smoke"> </div>}
 
         </>

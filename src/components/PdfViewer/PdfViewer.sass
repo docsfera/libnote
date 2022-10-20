@@ -8,23 +8,13 @@
     display: flex
     flex-direction: column
     align-items: center
-.book-aside
-  transition: 1s
-  z-index: 4 //TODO: preventDefault() !
-  position: fixed
-  right: -250px
-  height: 100vh
-  width: 250px
-  background: green
-.book-aside-active
-  right: 0
+
 .fixed-button
   cursor: pointer
   position: fixed
   z-index: 3
   width: 40px
   height: 40px
-  background: red
   border-radius: 100%
 .exit
   width: 20px
@@ -37,9 +27,13 @@
   transition: 1s
   right: 20px
   top: 20px
+  background: url("../../../public/images/ArrowGetPdfAside.svg") no-repeat center
 
 .getter-aside-active
-  right: 190px
+  right: 340px
+  transform: rotateY(180deg)
+  //background: url("../../../public/images/ArrowHidePdfAside.svg") no-repeat center
+
 
 .getter-note-creator
   transition: .5s

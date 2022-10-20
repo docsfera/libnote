@@ -4,16 +4,16 @@ import NoteCreator from "../NoteCreator/NoteCreator";
 
 type NoteCreatorComponentType = {
     userId: string
-    currentNoteContent: any
-    setCurrentNoteContent: any
+    currentNoteData: any
+    setCurrentNoteData: any
 }
 
 const NoteCreatorComponent: React.FC<NoteCreatorComponentType> = (props) => {
     return (
         <div className="note-creator-component">
             <NoteCreator isShowHeader={false}
-                         currentNoteContent={props.currentNoteContent}
-                         setCurrentNoteContent={props.setCurrentNoteContent}/>
+                         currentNoteData={props.currentNoteData}
+                         setCurrentNoteData={props.setCurrentNoteData}/>
         </div>
     );
 };
