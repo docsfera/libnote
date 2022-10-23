@@ -25,6 +25,8 @@ type PdfAsideType = {
     setCurrentNoteData: any
     setIsShowSmokeWindow: any
     setIsShowAside: any
+
+    currentNoteData: any
 }
 
 const PdfAside: React.FC<PdfAsideType> = (props) => {
@@ -39,9 +41,9 @@ const PdfAside: React.FC<PdfAsideType> = (props) => {
         }
     }
 
-    const getNoteCreatorComponentEvent = (noteName: string, noteContent: string, bookId: string, folderId: string) => {
+    const getNoteCreatorComponentEvent = (noteName: string, noteContent: string, bookId: string, folderId: string, noteId: string) => {
         !props.isShowNoteCreator && props.setIsShowNoteCreator(!props.isShowNoteCreator)
-        props.setCurrentNoteData({name: noteName, content: noteContent, bookId, folderId})
+        props.setCurrentNoteData({name: noteName, content: noteContent, bookId, folderId, noteId})
         !props.isShowSmokeWindow && props.setIsShowSmokeWindow(!props.isShowSmokeWindow)
         props.setIsShowAside(!props.isShowAside)
     }
@@ -60,7 +62,8 @@ const PdfAside: React.FC<PdfAsideType> = (props) => {
                           noteContent={i.content}
                           dateUpdate={i.dateupdate}
                           searchWord={searchWord}
-                          getNoteCreatorComponentEvent={getNoteCreatorComponentEvent}/>
+                          getNoteCreatorComponentEvent={getNoteCreatorComponentEvent}
+                          currentNoteData={props.currentNoteData}/>
                 )
             }
 

@@ -20,6 +20,11 @@ const GET_BOOK_BY_ID = gql`
     }
 `
 
+// type NoteData = {
+//     name: string
+//
+// }
+
 
 const PdfViewer = () => {
     const navigate = useNavigate()
@@ -29,7 +34,8 @@ const PdfViewer = () => {
     const [isShowAside, setIsShowAside] = useState(false)
     const [isShowNoteCreator, setIsShowNoteCreator] = useState(false)
 
-    const [currentNoteData, setCurrentNoteData] = useState({name: "name", content: "content", bookId: undefined, folderId: undefined})
+    const [currentNoteData, setCurrentNoteData] = useState({name: "name",
+        content: "content", bookId: undefined, folderId: undefined, noteId: undefined})
 
     const containerRef = useRef(null)
     const refPdfViewer = useRef(null)
@@ -214,6 +220,7 @@ const PdfViewer = () => {
             <PdfAside isShowAside={isShowAside}
                       isShowNoteCreator={isShowNoteCreator}
                       isShowSmokeWindow={isShowSmokeWindow}
+                      currentNoteData={currentNoteData}
                       setIsShowAside={setIsShowAside}
                       setIsShowNoteCreator={setIsShowNoteCreator}
                       setCurrentNoteData={setCurrentNoteData}

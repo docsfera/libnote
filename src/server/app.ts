@@ -143,10 +143,22 @@ const root = {
         , [input.mail, input.password])
         .then(res => res.rows[0])
     ,
-    createNote: async ({input}: any) =>
+    createNote: async ({input}: any) => {
+        console.log(input)
         await pool.query('INSERT INTO notes (userid, folderid, bookid, title, content, datecreate, dateupdate) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *'
             , [input.userid, input.folderid, input.bookid, input.title, input.content, input.datecreate, input.dateupdate])
             .then(res => res.rows[0])
+
+        if(input.folderid) {
+            const countOfNotes = await pool.query('SELECT countofnotes FROM folders WHERE id = ($1)',
+                [+input.folderid]).then(res => res.rows[0].countofnotes)
+
+            await pool.query('UPDATE folders SET countofnotes = ($1) WHERE id = ($2)'
+                , [countOfNotes + 1, +input.folderid])
+        }
+    }
+
+
     ,
     getAllNotes: async ({userid}: any) => await pool.query('SELECT * FROM notes WHERE userid = ($1) ORDER BY dateupdate DESC'
         , [+userid])
@@ -156,9 +168,19 @@ const root = {
         , [+userid])
         .then(res => res.rows)
     ,
-    deleteNoteById: async ({noteid}: any) => await pool.query('DELETE FROM notes WHERE id = ($1) RETURNING *'
+    deleteNoteById: async ({noteid}: any) =>
+        await pool.query('DELETE FROM notes WHERE id = ($1) RETURNING *'
             , [+noteid])
-            .then(res => res.rows[0])
+            .then( async (res) =>  {
+                if(res.rows[0].folderid) {
+                    const countOfNotes = await pool.query('SELECT countofnotes FROM folders WHERE id = ($1)',
+                        [+res.rows[0].folderid]).then(res => res.rows[0].countofnotes)
+                    await pool.query('UPDATE folders SET countofnotes = ($1) WHERE id = ($2)'
+                        , [countOfNotes - 1, +res.rows[0].folderid])
+                }
+                return res.rows[0]
+            })
+
     ,
     deleteBookById: async ({id}: any) => await pool.query('DELETE FROM books WHERE id = ($1) RETURNING *'
         , [+id])
@@ -186,9 +208,11 @@ const root = {
         , [name, id])
         .then(res => {res.rows[0]; console.log(name, id)})
     ,
-    updateNote: async ({input}: any) => await pool.query('UPDATE notes SET folderid = ($2), bookid = ($3), title = ($4), content = ($5), datecreate = ($6), dateupdate = ($7) WHERE id = ($1) RETURNING *'
-    , [input.id, input.folderid, input.bookid, input.title, input.content, input.datecreate, input.dateupdate])
-    .then(res => res.rows[0])
+    updateNote: async ({input}: any) => {
+        await pool.query('UPDATE notes SET folderid = ($2), bookid = ($3), title = ($4), content = ($5), datecreate = ($6), dateupdate = ($7) WHERE id = ($1) RETURNING *'
+            , [input.id, input.folderid, input.bookid, input.title, input.content, input.datecreate, input.dateupdate])
+            .then(res => res.rows[0])
+    }
     ,
     updateFolderCountNotes: async ({folderid, mode}: any) => {
         const countofnotes = await pool.query('SELECT countofnotes FROM folders WHERE id = ($1)',

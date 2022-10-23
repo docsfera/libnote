@@ -40,7 +40,7 @@ const GET_ALL_NOTES = gql`
 `
 
 const Main = () => {
-    const { loading, data, error, refetch} = useQuery(GET_ALL_NOTES, {variables: {userid: "1"}})
+    const getAllNotesQuery = useQuery(GET_ALL_NOTES, {variables: {userid: "1"}})
     const smokeWindow = useRef<HTMLDivElement>(null)
     useEffect(() => {
         if(smokeWindow && smokeWindow.current){
@@ -48,9 +48,9 @@ const Main = () => {
         }
     },[smokeWindow, smokeWindow.current])
 
-    useEffect(() => {}, [data])
-    const numOfNotes: any = (data && data.getAllNotes) && data.getAllNotes.length
-
+    useEffect(() => {getAllNotesQuery.refetch()}, [])
+    const numOfNotes: any = (getAllNotesQuery.data && getAllNotesQuery.data.getAllNotes) && getAllNotesQuery.data.getAllNotes.length
+    console.log(getAllNotesQuery.data)
     //TODO: как типизировать data, data.getAllNotes?
     return (
         <div>
@@ -60,7 +60,7 @@ const Main = () => {
 
                 <Folders numOfNotes={numOfNotes} smokeWindow={smokeWindow}/>
                 <NewBooks/>
-                <NewNotes/>
+                <NewNotes getAllNotesQuery={getAllNotesQuery}/>
             </div>
         </div>
 

@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import "./NewNotes.sass"
 import {gql, useMutation, useQuery} from "@apollo/client"
 import {NavLink, useNavigate} from "react-router-dom"
@@ -34,9 +34,20 @@ const UPDATE_FOLDER_COUNT_NOTES = gql`
 
 `
 
+type NewNotesType = {
+    getAllNotesQuery: any
+}
 
-const NewNotes = () => {
-    useEffect(() => {refetch()}, [])
+
+const NewNotes: React.FC<NewNotesType> = (props) => {
+    const [notesData, setNotesData] = useState<any>([])
+    useEffect(() => {
+        setNotesData(props.getAllNotesQuery.data)
+    }, [props.getAllNotesQuery.data])
+
+
+    const refetch = () => props.getAllNotesQuery.refetch()
+    //const data = props.getAllNotesQuery.data
 
     const navigate = useNavigate()
     const goToNoteCreator = (noteId? : string) => {
@@ -54,14 +65,16 @@ const NewNotes = () => {
         await refetch()
     }
 
-    const { loading, data, error, refetch} = useQuery(GET_ALL_NOTES, {variables: {userid: "1"}})
+
+
+
 
     return (
         <div className="notes-section">
             <div className="notes-wrapper">
                 <div className="notes-info">
                     <NavLink to="notes" className="name-section">Заметки</NavLink>
-                    <p className="section-count">{`Всего ${data ? data.getAllNotes.length : "0"} заметок`}</p>
+                    <p className="section-count">{`Всего ${(notesData && notesData.getAllNotes) ? notesData.getAllNotes.length : "0"} заметок`}</p>
                 </div>
                 <div className="create-note" onClick={() => goToNoteCreator()}>
                     Создать заметку
@@ -69,8 +82,8 @@ const NewNotes = () => {
             </div>
 
             <div className="notes">
-                {data
-                    ? data.getAllNotes.map((i: any) => <Note noteId={i.id}
+                {(notesData && notesData.getAllNotes)
+                    ? notesData.getAllNotes.map((i: any) => <Note noteId={i.id}
                                                              key={i.id}
                                                              folderId={i.folderid}
                                                              bookId={i.bookid}
