@@ -4,6 +4,7 @@ import {NavLink, useNavigate} from "react-router-dom"
 import {gql, useQuery} from "@apollo/client";
 import Book from "../Book/Book";
 import Arrow from "../Arrow/Arrow";
+import {AuthContext} from "../../AuthProvider";
 
 const GET_ALL_BOOKS = gql`
     query getAllBooks($userid: ID){
@@ -17,7 +18,8 @@ const GET_ALL_BOOKS = gql`
 
 const NewBooks = () => {
     const navigate = useNavigate()
-    const {data} = useQuery(GET_ALL_BOOKS, {variables:{userid: "1"}})
+    const {userInfo} = React.useContext(AuthContext)
+    const {data} = useQuery(GET_ALL_BOOKS, {variables:{userid: userInfo.id}})
 
     let [position, setPosition] = useState(0)
     const gg = useRef(null)

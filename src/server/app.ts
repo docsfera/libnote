@@ -21,7 +21,7 @@ const pool = new Pool({
 });
 
 const schema = buildSchema(`
-    type User {
+    type User{
         id: ID
         mail: String  
         password: String
@@ -38,7 +38,7 @@ const schema = buildSchema(`
         countofnotes: Int
     }
     
-    type Note {
+    type Note{
         id: ID
         title: String
         folderid: ID
@@ -139,12 +139,12 @@ const root = {
         , [id])
         .then(res => res.rows[0])
     ,
-    createUser: async ({input}: any) => await pool.query('INSERT INTO users (mail, password) VALUES ($1, $2) RETURNING *'
-        , [input.mail, input.password])
-        .then(res => res.rows[0])
+    createUser: async ({input}: any) => await pool.query('INSERT INTO users (mail, password) VALUES ($1, $2) RETURNING *',
+            [input.mail, input.password]).then(res => res.rows[0])
+
+
     ,
     createNote: async ({input}: any) => {
-        console.log(input)
         await pool.query('INSERT INTO notes (userid, folderid, bookid, title, content, datecreate, dateupdate) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *'
             , [input.userid, input.folderid, input.bookid, input.title, input.content, input.datecreate, input.dateupdate])
             .then(res => res.rows[0])
@@ -197,8 +197,9 @@ const root = {
     }
     ,
     createBook: async ({input}: any) => await pool.query('INSERT INTO books (userid, name, image) VALUES ($1, $2, $3) RETURNING *'
-        , [input.userid, input.name, input.image])
-        .then(res => res.rows[0])
+            , [input.userid, input.name, input.image])
+            .then(res => res.rows[0])
+
     ,
     createFolder: async ({input}: any) => await pool.query('INSERT INTO folders (userid, name, countofnotes) VALUES ($1, $2, $3) RETURNING *'
         , [input.userid, input.name, input.countofnotes])

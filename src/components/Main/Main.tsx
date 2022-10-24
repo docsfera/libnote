@@ -1,24 +1,11 @@
-// const Main = () => (
-//     <main>
-//         <Switch>
-//             <Route exact path='/' component={Home}/>
-//             <Route path='/roster' component={Roster}/>
-//             <Route path='/schedule' component={Schedule}/>
-//         </Switch>
-//     </main>
-// )
-
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef} from 'react'
 import "./Main.sass"
-import Header from "../Header/Header";
+import Header from "../Header/Header"
 import Folders from "../Folders/Folders"
-import NewBooks from "../NewBooks/NewBooks";
-import NewNotes from "../NewNotes/NewNotes";
-import LatestBooks from "../LatestBooks/LatestBooks";
-import InputNoteCreator from "../InputNoteCreator/InputNoteCreator";
-import Note from "../Note/Note";
-import {useQuery, gql, useMutation} from '@apollo/client';
-
+import NewBooks from "../NewBooks/NewBooks"
+import NewNotes from "../NewNotes/NewNotes"
+import {AuthContext} from "../../AuthProvider"
+import {useQuery, gql, useMutation} from '@apollo/client'
 
 const DELETE_NOTE_BY_ID = gql`
       mutation deleteNoteById($noteid: ID) {
@@ -26,7 +13,7 @@ const DELETE_NOTE_BY_ID = gql`
             id
         }
     }
-    `;
+`
 
 const GET_ALL_NOTES = gql`
     query getAllNotes($userid: ID) {
@@ -40,7 +27,13 @@ const GET_ALL_NOTES = gql`
 `
 
 const Main = () => {
-    const getAllNotesQuery = useQuery(GET_ALL_NOTES, {variables: {userid: "1"}})
+
+
+    const {userInfo} = React.useContext(AuthContext)
+
+
+
+    const getAllNotesQuery = useQuery(GET_ALL_NOTES, {variables: {userid: userInfo.id}})
     const smokeWindow = useRef<HTMLDivElement>(null)
     useEffect(() => {
         if(smokeWindow && smokeWindow.current){
@@ -58,7 +51,7 @@ const Main = () => {
             <div className="main">
                 <div ref={smokeWindow} className="smoke"> </div>
 
-                <Folders numOfNotes={numOfNotes} smokeWindow={smokeWindow}/>
+                <Folders numOfNotes={numOfNotes} smokeWindow={smokeWindow} userInfo={userInfo}/>
                 <NewBooks/>
                 <NewNotes getAllNotesQuery={getAllNotesQuery}/>
             </div>

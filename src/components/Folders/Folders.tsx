@@ -4,6 +4,7 @@ import Arrow from "../Arrow/Arrow"
 import "./Folders.sass"
 import {gql, useMutation, useQuery} from "@apollo/client";
 import {NavLink, useNavigate} from "react-router-dom"
+import {AuthContext} from "../../AuthProvider";
 
 const GET_ALL_FOLDERS = gql`
     query getAllFolders($userid: ID) {
@@ -37,6 +38,7 @@ const CREATE_FOLDER = gql`
 type FoldersType = {
     numOfNotes: any
     smokeWindow: any
+    userInfo: any
 }
 
 
@@ -44,8 +46,15 @@ const Folders: React.FC<FoldersType> = (props) => {
     useEffect(() => {refetch()}, [props.numOfNotes])
     const navigate = useNavigate()
 
+    //const authContext = React.useContext(AuthContext)
+
+    console.log({haha: props.userInfo.id})
+
+
+
+
     const [createFolder] = useMutation(CREATE_FOLDER)
-    const { loading, data, error, refetch} = useQuery(GET_ALL_FOLDERS, {variables: {userid: "1"}})
+    const { loading, data, error, refetch} = useQuery(GET_ALL_FOLDERS, {variables: {userid: props.userInfo.id}})
 
     const createFolderWindow = useRef<HTMLDivElement>(null)
 
