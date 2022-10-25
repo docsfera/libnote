@@ -37,9 +37,16 @@
 }
 
 .input-section{
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
+.error{
+  font-family: Inter, sans-serif;
+  font-weight: 400;
+  color: red;
+  font-size: 0.9em;
 
+  margin-bottom: 4px;
+}
 .name-input{
   font-family: Inter, sans-serif;
   font-weight: 400;
@@ -60,6 +67,10 @@
   font-weight: 400;
   padding-left: 20px;
   border-radius: 5px;
+}
+
+.input-error{
+  border: 1px solid red;
 }
 
 

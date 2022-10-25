@@ -1,15 +1,20 @@
-import express from "express"
+import express, {json} from "express"
 import {graphqlHTTP} from "express-graphql"
 import cors from "cors"
 import {buildSchema} from "graphql"
 import fileUpload, {UploadedFile} from "express-fileupload"
 import pg from "pg"
 import path from "path"
+import {body, validationResult} from "express-validator"
+import * as jwt from "jsonwebtoken"
+import { default as bcrypt } from "bcryptjs"
+
 
 
 //@ts-ignore
 import {createDir} from "./services/fileService.ts"
 import fs from "fs";
+
 
 const Pool = pg.Pool
 const pool = new Pool({
@@ -139,8 +144,26 @@ const root = {
         , [id])
         .then(res => res.rows[0])
     ,
-    createUser: async ({input}: any) => await pool.query('INSERT INTO users (mail, password) VALUES ($1, $2) RETURNING *',
-            [input.mail, input.password]).then(res => res.rows[0])
+    createUser: async (input : any) => {
+
+        console.log(input)
+
+
+
+        // console.log(body('mail', 'h').isBoolean().builder.op)
+        // console.log('gggg')
+        // console.log(validationResult)
+
+        // const login: validator.RequestValidation = input.mail
+        // const userPassword: validator.RequestValidation = input.password
+
+
+
+        // console.log(login.check('login', "Login must be longer than 3 and shorter than 12")
+        //     .isLength({min:3, max:12}))
+        // await pool.query('INSERT INTO users (mail, password) VALUES ($1, $2) RETURNING *',
+        //     [input.mail, input.password]).then(res => res.rows[0])
+    }
 
 
     ,
@@ -298,7 +321,48 @@ app.post('/', function(req, res) {
     //localStorage.setItem("userId", JSON.stringify(1))
 
     root.downloadBook(file, userId)
+})
+
+
+app.post('/registration',
+    body('mail', 'Login must be longer than 3 and shorter than 12')
+        .trim()
+        .isLength({ min: 3, max: 12 }),
+    // password must be at least 5 chars long
+    body('password', 'Password must be longer than 5')
+        .trim()
+        .isLength({ min: 5 })
+        .custom(async (password, {req}) => {
+            const confirmPassword = req.body.confirmPassword
+            if(password !== confirmPassword){
+                throw new Error('Passwords must be same')
+            }
+        }),
+    function(req, res) {
+        try{
+            const errors = validationResult(req)
+
+            if (!errors.isEmpty()) {
+                return res.status(401).json(errors.array()[0].msg)
+            }else{
+                const {mail, password} = req.body
+                const hashPassword = bcrypt.hashSync(password, 1)
+
+
+                root.createUser({mail, password: hashPassword})
+
+                //createDir
+
+                return res.status(200).json("ok");
+            }
+        }catch (e) {
+            return res.status(401).json("Server Error")
+        }
+
+
 });
+
+
 
 app.use('/graphql', graphqlHTTP({
         schema: schema,

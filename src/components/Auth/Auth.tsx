@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {AuthContext} from "../../AuthProvider"
 import "./Auth.scss"
 import {gql, useMutation} from "@apollo/client"
+import cn from "classnames";
 
 const CREATE_USER = gql`
     mutation createUser($input: UserInput) {
@@ -17,19 +18,45 @@ const Auth = () => {
     const [createUser] = useMutation(CREATE_USER)
     const [userName, setUserName] = useState("")
     const [userPassword, setUserPassword] = useState("")
+    const [confirmPassword, setConfirmPassword] = useState("")
+    const [errorMessage, setErrorMessage] = useState("")
+    const [isLoginError, setIsLoginError] = useState(false)
+    const [isPasswordError, setIsPasswordError] = useState(false)
 
     const token = React.useContext(AuthContext)
     console.log({token})
 
     const loginEvent = async () => {
-        await createUser({variables: {input: {mail: userName, password: userPassword}}})
-            .then((res) => {console.log(res.data.createUser.id);
-            token.onLogin({
-                id: res.data.createUser.id,
-                mail: res.data.createUser.mail,
-                token: "token"
-            })})
-            .catch(() => alert("Что-то пошло не так"))
+
+        setIsLoginError(false)
+        setIsPasswordError(false)
+
+        const formData = new FormData()
+        formData.append('mail', userName)
+        formData.append('password', userPassword)
+        formData.append('confirmPassword', confirmPassword)
+
+
+        await fetch('/registration', {
+            method: 'POST',
+            body: formData
+        })
+            .then(res => res.json())
+            .then(errors => {
+                setErrorMessage(errors)
+                errors.includes("Login") && setIsLoginError(true)
+                errors.includes("Password") && setIsPasswordError(true)
+                errors.includes("ok") && setErrorMessage("") // TODO: takoe...
+            })
+
+        // await createUser({variables: {input: {mail: userName, password: userPassword}}})
+        //     .then((res) => {console.log(res.data.createUser.id);})
+            // token.onLogin({
+            //     id: res.data.createUser.id,
+            //     mail: res.data.createUser.mail,
+            //     token: "token"
+            // })})
+            // .catch(() => alert("Что-то пошло не так"))
     }
 
 
@@ -41,18 +68,28 @@ const Auth = () => {
                 <div className="auth-inputs">
                     <p className="name-section">Регистрация</p>
                     <div className="input-section">
+                        <p className="error">{errorMessage}</p>
                         <p className="name-input">Имя пользователя</p>
-                        <input className="input" type="text" placeholder="Введите логин" value={userName} onChange={(e) => setUserName(e.target.value)}/>
+
+                        <input className={cn("input", {"input-error": isLoginError})} type="text" placeholder="Введите логин" value={userName} onChange={(e) => setUserName(e.target.value)}/>
                     </div>
 
                     <div className="input-section">
                         <p className="name-input">Пароль</p>
-                        <input className="input" type="password" placeholder="Введите пароль" value={userPassword} onChange={(e) => setUserPassword(e.target.value)}/>
+                        <input className={cn("input", {"input-error": isPasswordError})}
+                               type="password"
+                               placeholder="Введите пароль"
+                               value={userPassword}
+                               onChange={(e) => setUserPassword(e.target.value)}/>
                     </div>
 
                     <div className="input-section">
                         <p className="name-input">Подтвердить пароль</p>
-                        <input className="input" placeholder="Подтвердите пароль" type="password"/>
+                        <input className={cn("input", {"input-error": isPasswordError})}
+                               placeholder="Подтвердите пароль"
+                               type="password"
+                               value={confirmPassword}
+                               onChange={(e) => setConfirmPassword(e.target.value)}/>
                     </div>
 
                     <button className="create-account" onClick={loginEvent}>Создать аккаунт</button>
