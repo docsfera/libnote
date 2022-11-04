@@ -1,8 +1,7 @@
 import React, {useState} from 'react'
-import {useMutation} from "@apollo/client"
-import {AuthContext} from "../../AuthProvider"
 import cn from "classnames"
-import {gql} from "@apollo/client";
+import {gql, useMutation} from "@apollo/client"
+import {AuthContext} from "../../AuthProvider"
 
 const CREATE_USER = gql`
     mutation createUser($input: UserInput) {
@@ -13,11 +12,11 @@ const CREATE_USER = gql`
     }
 `
 
-type AuthType = {
+type RegistrationType = {
     changeAuthType: any
 }
 
-const Auth: React.FC<AuthType> = (props) => {
+const Registration: React.FC<RegistrationType> = (props) => {
 
     const [createUser] = useMutation(CREATE_USER)
     const [userName, setUserName] = useState("")
@@ -28,7 +27,7 @@ const Auth: React.FC<AuthType> = (props) => {
     const [isPasswordError, setIsPasswordError] = useState(false)
 
     const token = React.useContext(AuthContext)
-    ///console.log({token})
+    console.log({token})
 
     const loginEvent = async () => {
 
@@ -40,24 +39,25 @@ const Auth: React.FC<AuthType> = (props) => {
         formData.append('password', userPassword)
         formData.append('confirmPassword', confirmPassword)
 
-
-        await fetch('/login', {
+        await fetch('/registration', {
             method: 'POST',
             body: formData
         })
             .then(res => res.json())
-            .then(errors => {
-                setErrorMessage(errors.message)
-                errors.message.includes("Login") && setIsLoginError(true)
-                errors.message.includes("Password", "password") && setIsPasswordError(true)
-                if (errors.message.includes("ok")) {
-                    setErrorMessage("") // TODO: takoe...
-
-                    token.onLogin({
-                        id: errors.user.id,
-                        mail: errors.user.mail,
-                        token: errors.user.token,
-                    }).catch(() => alert("Что-то пошло не так"))
+            .then(async errors =>  {
+                setErrorMessage(errors)
+                errors.includes("Login") && setIsLoginError(true)
+                errors.includes("Password") && setIsPasswordError(true)
+                if(errors.includes("ok")) {
+                    setErrorMessage("")
+                    await createUser({variables: {input: {mail: userName, password: userPassword}}})
+                     .then((res) => {
+                         token.onLogin({
+                             id: res.data.createUser.id,
+                             mail: res.data.createUser.mail,
+                             token: "token"
+                         }).catch(() => alert("Что-то пошло не так"))
+                     })
                 }
             })
     }
@@ -65,7 +65,7 @@ const Auth: React.FC<AuthType> = (props) => {
     return (
         <>
             <div className="auth-inputs">
-                <p className="name-section">Вход</p>
+                <p className="name-section">Регистрация</p>
                 <div className="input-section">
                     <p className="error">{errorMessage}</p>
                     <p className="name-input">Имя пользователя</p>
@@ -82,12 +82,22 @@ const Auth: React.FC<AuthType> = (props) => {
                            onChange={(e) => setUserPassword(e.target.value)}/>
                 </div>
 
-                <button className="create-account" onClick={loginEvent}>Войти в аккаунт</button>
-                <p className="auth-wrap" onClick={props.changeAuthType}>Регистрация</p>
+                <div className="input-section">
+                    <p className="name-input">Подтвердить пароль</p>
+                    <input className={cn("input", {"input-error": isPasswordError})}
+                           placeholder="Подтвердите пароль"
+                           type="password"
+                           value={confirmPassword}
+                           onChange={(e) => setConfirmPassword(e.target.value)}/>
+                </div>
+
+                <button className="create-account" onClick={loginEvent}>Создать аккаунт</button>
+                <p className="auth-wrap" onClick={props.changeAuthType}>Войти</p>
+
 
             </div>
         </>
     );
 };
 
-export default Auth
+export default Registration;

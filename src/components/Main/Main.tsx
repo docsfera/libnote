@@ -30,6 +30,9 @@ const Main = () => {
 
 
     const {userInfo} = React.useContext(AuthContext)
+    const {onLogout} = React.useContext(AuthContext)
+
+
 
 
 
@@ -45,10 +48,15 @@ const Main = () => {
     const numOfNotes: any = (getAllNotesQuery.data && getAllNotesQuery.data.getAllNotes) && getAllNotesQuery.data.getAllNotes.length
     console.log(getAllNotesQuery.data)
     //TODO: как типизировать data, data.getAllNotes?
+
+
+
+
     return (
         <div>
             <Header/>
             <div className="main">
+                <button onClick={onLogout}> 555</button>
                 <div ref={smokeWindow} className="smoke"> </div>
 
                 <Folders numOfNotes={numOfNotes} smokeWindow={smokeWindow} userInfo={userInfo}/>

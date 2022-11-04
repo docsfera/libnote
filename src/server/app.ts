@@ -6,7 +6,7 @@ import fileUpload, {UploadedFile} from "express-fileupload"
 import pg from "pg"
 import path from "path"
 import {body, validationResult} from "express-validator"
-import * as jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken"
 import { default as bcrypt } from "bcryptjs"
 
 
@@ -86,12 +86,17 @@ const schema = buildSchema(`
         getAllUsers: [User]
         getNoteById(id: ID): Note
         getUserById(id: ID): User
+        getUserByToken(token: String): User
+        getUser(input: UserInput): User
+        
         getBookById(id: ID): Book
         getFolderById(id: ID): Folder
         getAllNotes(userid: ID): [Note]
         getAllFolders(userid: ID): [Folder]
         getAllBooks(userid: ID): [Book]
         getNotesByFolder(folderid: ID): [Note] 
+        
+        getUserPasswordByLogin(input: UserInput): User
         
         
     }
@@ -131,6 +136,16 @@ const root = {
         , [params.id])
         .then(res => res.rows[0])
     ,
+
+    getUser: async ({input}: any) => await pool.query('SELECT * FROM users WHERE mail = ($1)'
+        , [input.mail]).then(res => res.rows[0])
+
+    ,
+    getUserByToken: async (token: any) => await pool.query('SELECT * FROM users WHERE id = ($1)'
+                //@ts-ignore
+            , [ jwt.verify(token.token, 'volod').id]).then(res => res.rows[0])
+
+    ,
     getNoteById: async ({id}: any) => await pool.query('SELECT * FROM notes WHERE id = ($1)'
     , [id])
     .then(res => res.rows[0])
@@ -144,27 +159,8 @@ const root = {
         , [id])
         .then(res => res.rows[0])
     ,
-    createUser: async (input : any) => {
-
-        console.log(input)
-
-
-
-        // console.log(body('mail', 'h').isBoolean().builder.op)
-        // console.log('gggg')
-        // console.log(validationResult)
-
-        // const login: validator.RequestValidation = input.mail
-        // const userPassword: validator.RequestValidation = input.password
-
-
-
-        // console.log(login.check('login', "Login must be longer than 3 and shorter than 12")
-        //     .isLength({min:3, max:12}))
-        // await pool.query('INSERT INTO users (mail, password) VALUES ($1, $2) RETURNING *',
-        //     [input.mail, input.password]).then(res => res.rows[0])
-    }
-
+    createUser: async (input : any) => await pool.query('INSERT INTO users (mail, password) VALUES ($1, $2) RETURNING *',
+            [input.mail, input.password]).then(res => res.rows[0])
 
     ,
     createNote: async ({input}: any) => {
@@ -180,6 +176,12 @@ const root = {
                 , [countOfNotes + 1, +input.folderid])
         }
     }
+    ,
+
+    getUserPasswordByLogin: async ({input}: any) => await pool.query('SELECT password FROM users WHERE mail = ($1)',
+            [input.mail]).then(res => res.rows[0].password)
+
+
 
 
     ,
@@ -323,7 +325,6 @@ app.post('/', function(req, res) {
     root.downloadBook(file, userId)
 })
 
-
 app.post('/registration',
     body('mail', 'Login must be longer than 3 and shorter than 12')
         .trim()
@@ -343,24 +344,65 @@ app.post('/registration',
             const errors = validationResult(req)
 
             if (!errors.isEmpty()) {
-                return res.status(401).json(errors.array()[0].msg)
+                return res.status(401).json({message: errors.array()[0].msg})
             }else{
                 const {mail, password} = req.body
                 const hashPassword = bcrypt.hashSync(password, 1)
 
-
                 root.createUser({mail, password: hashPassword})
+                //createDir
+                return res.status(200).json({message: "ok"});
+            }
+        }catch (e) {
+            return res.status(401).json({message: "Server Error"})
+        }
+});
+
+app.post('/login',
+    body('mail', 'Login must be longer than 3 and shorter than 12')
+        .trim()
+        .isLength({ min: 3, max: 12 }),
+    // password must be at least 5 chars long
+    body('password', 'Password must be longer than 5')
+        .trim()
+        .isLength({ min: 5 }),
+
+    (req, res) => {
+        try{
+            const errors = validationResult(req)
+
+            if (!errors.isEmpty()) {
+                return res.status(401).json({message: errors.array()[0].msg})
+            }else{
+                const {mail, password} = req.body
+                const hashPassword = bcrypt.hashSync(password, 1)
+
+                root.getUser({input: {mail, password: hashPassword}}).then(data => {
+                    if(data){
+                        const isPassValid = bcrypt.compareSync(password, data.password)
+                        console.log(isPassValid)
+                        if (!isPassValid) {
+                            return res.status(400).json({message: "Invalid password"})
+                        }
+                        const token = jwt.sign({id: data.id},  'volod', {expiresIn: "1h"})
+
+                        return res.status(200).json({message: "ok", user: {mail: data.mail, id: data.id, token}})
+                    }else{
+                        return res.status(400).json( {message:"User with such a login does not exist"})
+                    }
+                })
+
+
+
+
 
                 //createDir
 
-                return res.status(200).json("ok");
             }
         }catch (e) {
-            return res.status(401).json("Server Error")
+            return res.status(401).json({message: "Server Error"})
         }
-
-
-});
+    });
 
 
 

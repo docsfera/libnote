@@ -1,11 +1,16 @@
 import React from 'react';
 import "./Header.sass"
 import {NavLink} from "react-router-dom";
+import {AuthContext} from "../../AuthProvider";
 
 const Header = () => {
+
+    const {userInfo} = React.useContext(AuthContext)
+
+
     return (
         <header className="header">
-            <p className="user-name">Александр Нистеренко</p>
+            <p className="user-name">{userInfo.mail}</p>
             <img src={`${process.env.PUBLIC_URL}/images/avatar.png`} alt="" className="user-avatar"/>
             {/*<div className="space-between">*/}
             {/*    <div className="menu" >*/}
