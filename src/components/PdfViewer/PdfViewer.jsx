@@ -34,8 +34,8 @@ const PdfViewer = () => {
     const [isShowAside, setIsShowAside] = useState(false)
     const [isShowNoteCreator, setIsShowNoteCreator] = useState(false)
 
-    const [currentNoteData, setCurrentNoteData] = useState({name: "name",
-        content: "content", bookId: undefined, folderId: undefined, noteId: undefined})
+    const [currentNoteData, setCurrentNoteData] = useState({name: "Untitled",
+        content: "", bookId: undefined, folderId: undefined, noteId: undefined})
 
     const containerRef = useRef(null)
     const refPdfViewer = useRef(null)
@@ -224,7 +224,8 @@ const PdfViewer = () => {
                       setIsShowAside={setIsShowAside}
                       setIsShowNoteCreator={setIsShowNoteCreator}
                       setCurrentNoteData={setCurrentNoteData}
-                      setIsShowSmokeWindow={setIsShowSmokeWindow}/>
+                      setIsShowSmokeWindow={setIsShowSmokeWindow}
+                      userId={userId}/>
 
             {isShowNoteCreator && <NoteCreatorComponent id={userId}
                                                         currentNoteData={currentNoteData}

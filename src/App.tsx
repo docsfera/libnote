@@ -42,7 +42,7 @@ function App() {
                   {/*<Header/>*/}
                   <Routes>
                       <Route path='/' element={<Main/>}/>
-                      {/*<Route path='/books' element={<Books user={'user'}/>}/>*/}
+                      <Route path='/books' element={<Books userInfo={value.userInfo}/>}/>
                       <Route path='/notes' element={<Notes />}/>
                       <Route path='/pdf-viewer/:userId' element={<PdfViewer />}/>
                       <Route path='/note-creator' element={<NoteCreator />}/>

@@ -3,6 +3,7 @@ import Header from "../Header/Header"
 import './NoteCreator.sass'
 import {gql, useMutation, useQuery} from "@apollo/client"
 import {useLocation, useNavigate, useParams} from "react-router-dom"
+import {AuthContext} from "../../AuthProvider";
 
 const GET_ALL_FOLDERS = gql`
     query getAllFolders($userid: ID) {
@@ -64,18 +65,20 @@ type NoteCreatorType = {
 }
 
 const NoteCreator: React.FC<NoteCreatorType> = (props) => {
+    const {userInfo} = React.useContext(AuthContext)
     const navigate = useNavigate()
     const {id} = useParams()
     const { state }: any = useLocation() //TODO: any
 
 
     const {data, refetch} = useQuery(GET_NOTE_BY_ID, {variables: {id: id}})
-    const allFolders = useQuery(GET_ALL_FOLDERS, {variables: {userid: "1"}}).data
-    const dataBooks = useQuery(GET_ALL_BOOKS, {variables: {userid: "1"}}).data
+    const allFolders = useQuery(GET_ALL_FOLDERS, {variables: {userid: userInfo.id}}).data
+    const dataBooks = useQuery(GET_ALL_BOOKS, {variables: {userid: userInfo.id}}).data
 
     const [createNote] = useMutation(CREATE_NOTE)
     const [updateNote] = useMutation(UPDATE_NOTE)
     const [updateFolderCountNotes] = useMutation(UPDATE_FOLDER_COUNT_NOTES)
+
 
     const [noteName, setNoteName] = useState("Untitled")
     const [noteContent, setNoteContent] = useState("")
@@ -85,7 +88,7 @@ const NoteCreator: React.FC<NoteCreatorType> = (props) => {
     const [idSelectedFolder, setIdSelectedFolder] = useState<string | null>(null)
     const [idSelectedBook, setIdSelectedBook] = useState<string | null>(null)
 
-    const [pathToImageSelectedBook, setPathToImageSelectedBook] = useState<string>("/images/book1.png") // `/files/1/${useGetImageBook(idSelectedBook)}`
+    const [pathToImageSelectedBook, setPathToImageSelectedBook] = useState<string>("/images/non-found-book.png") // `/files/1/${useGetImageBook(idSelectedBook)}`
 
     const allFolder = useRef<HTMLDivElement>(null)
     const allBooks = useRef<HTMLDivElement>(null)
@@ -253,7 +256,7 @@ const NoteCreator: React.FC<NoteCreatorType> = (props) => {
                 {
                     variables: {
                         input: {
-                            userid: "1",
+                            userid: userInfo.id,
                             folderid: idSelectedFolder,
                             bookid: idSelectedBook,
                             title: (noteName === "") ? "Untitled" : noteName,
@@ -271,7 +274,7 @@ const NoteCreator: React.FC<NoteCreatorType> = (props) => {
                         variables: {
                             input: {
                                 id: props.currentNoteData.noteId,
-                                userid: "1",
+                                userid: userInfo.id,
                                 folderid: idSelectedFolder,
                                 bookid: idSelectedBook,
                                 title: (noteName === "") ? "Untitled" : noteName,
@@ -295,7 +298,7 @@ const NoteCreator: React.FC<NoteCreatorType> = (props) => {
                         variables: {
                             input: {
                                 id: noteId,
-                                userid: "1",
+                                userid: userInfo.id,
                                 folderid: idSelectedFolder,
                                 bookid: idSelectedBook,
                                 title: (noteName === "") ? "Untitled" : noteName,

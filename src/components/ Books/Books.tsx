@@ -13,7 +13,7 @@ const pdfjsLib = require("pdfjs-dist/build/pdf")
 const pdfjsViewer = require("pdfjs-dist/web/pdf_viewer")
 
 type BooksType = {
-    user: any
+    userInfo: any
 }
 
 const GG = gql`
@@ -48,7 +48,7 @@ const Books: React.FC<BooksType> = (props) => {
     const navigate = useNavigate()
     const [mut] = useMutation(GG)
     //const [refences, setRefences] = useState([])
-    const {data, refetch} = useQuery(GET_ALL_BOOKS, {variables:{userid: "1"}, pollInterval: 500})
+    const {data, refetch} = useQuery(GET_ALL_BOOKS, {variables:{userid: props.userInfo.id}, pollInterval: 500})
     const [saveBase64] = useMutation(SAVE_BASE_64)
 
     const refCanvas = useRef(null)
@@ -58,7 +58,7 @@ const Books: React.FC<BooksType> = (props) => {
             console.log(data.getAllBooks)
             data.getAllBooks.map((i: any, index: any) => {
                 if (!i.image) {
-                    let bookUrl = `http://localhost:3000/files/1/${i.name}`
+                    let bookUrl = `http://localhost:3000/files/${props.userInfo.id}/${i.name}`
                     setCanvas(refCanvas, bookUrl, i.id)
                 }
             })
@@ -101,13 +101,14 @@ const Books: React.FC<BooksType> = (props) => {
     }, [])
 
     const pimp = (name: string) => {
-        navigate('../pdf-viewer/1', {state: {name}}) // TODO: useQuery(getBookByID)???
+        navigate(`../pdf-viewer/${props.userInfo.id}`, {state: {name}}) // TODO: useQuery(getBookByID)???
     }
 
     const uploadFile = (file: any) => {
         let formData = new FormData()
+        console.log(file, props.userInfo.id)
         formData.append('file', file)
-        formData.append('userId', "1")
+        formData.append('userId', props.userInfo.id)
         fetch('/', {
             method: 'POST',
             body: formData

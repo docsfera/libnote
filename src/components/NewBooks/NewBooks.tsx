@@ -31,7 +31,7 @@ const NewBooks = () => {
     return (
         <div className="folders-section" ref={bookSection}>
             <NavLink to="books" className="name-section">Книги</NavLink>
-            <p className="section-count">Всего 8 книг</p>
+            <p className="section-count">{`Всего ${bookCount} книг`}</p>
             <div className="folders">
                     <Arrow gg={gg}
                     position={position}
@@ -46,12 +46,18 @@ const NewBooks = () => {
                 <div className="folders-container">
                     <div ref={gg} className="itemser">
                         {data && data.getAllBooks.map((i:any) =>
-                            <img src={`/files/1/${i.image}`}
+                            i.image
+                                ? <img src={`/files/1/${i.image}`}
                                  alt=""
                                  key={i.id}
                                  className="image"
-                                 onClick={()=>navigate(`/pdf-viewer/1`, {state: {name: i.name}})}/>)
-                        }
+                                 onClick={()=>navigate(`/pdf-viewer/${userInfo.id}`, {state: {name: i.name}})}/>
+                                : <img src="/images/non-found-book.png" /// todo: another component
+                                       alt=""
+                                       key={i.id}
+                                       className="image"
+                                       onClick={()=>navigate(`/pdf-viewer/${userInfo.id}`, {state: {name: i.name}})}/> //TODO: another onclick
+                        )}
                     </div>
                 </div>
                 <Arrow gg={gg}

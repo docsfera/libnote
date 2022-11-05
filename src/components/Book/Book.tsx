@@ -22,7 +22,7 @@ const Book: React.FC<BookType> = (props) => {
         <div className="book" onClick={() => props.pimp(props.name)}>
             {props.imageName
                 ? <img src={`/files/1/${props.imageName}`} alt="" className="image"/>
-                : <div className="empty-image"> </div>}
+                :  <img src="/images/non-found-book.png" alt="" className="image"/>}
 
             <p className="book-name">{props.name}</p>
         </div>

@@ -27,11 +27,12 @@ type PdfAsideType = {
     setIsShowAside: any
 
     currentNoteData: any
+    userId: string
 }
 
 const PdfAside: React.FC<PdfAsideType> = (props) => {
 
-    const { loading, data, error, refetch} = useQuery(GET_ALL_NOTES, {variables: {userid: "1"}})
+    const { loading, data, error, refetch} = useQuery(GET_ALL_NOTES, {variables: {userid: props.userId}})
     const [searchWord, setSearchWord] = useState("")
 
     const condition = (note: any, searchWord: string) => {

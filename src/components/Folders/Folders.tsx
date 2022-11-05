@@ -86,7 +86,7 @@ const Folders: React.FC<FoldersType> = (props) => {
                 {
                     variables: {
                         input: {
-                            userid: "1",
+                            userid: props.userInfo.id,
                             name: nameCreatedFolder,
                             countofnotes: 0
                         }

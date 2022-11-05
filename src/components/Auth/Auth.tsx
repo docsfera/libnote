@@ -2,16 +2,7 @@ import React, {useState} from 'react'
 import {useMutation} from "@apollo/client"
 import {AuthContext} from "../../AuthProvider"
 import cn from "classnames"
-import {gql} from "@apollo/client";
-
-const CREATE_USER = gql`
-    mutation createUser($input: UserInput) {
-        createUser(input: $input){
-            id
-            mail
-        }
-    }
-`
+import {gql} from "@apollo/client"
 
 type AuthType = {
     changeAuthType: any
@@ -19,16 +10,13 @@ type AuthType = {
 
 const Auth: React.FC<AuthType> = (props) => {
 
-    const [createUser] = useMutation(CREATE_USER)
     const [userName, setUserName] = useState("")
     const [userPassword, setUserPassword] = useState("")
-    const [confirmPassword, setConfirmPassword] = useState("")
     const [errorMessage, setErrorMessage] = useState("")
     const [isLoginError, setIsLoginError] = useState(false)
     const [isPasswordError, setIsPasswordError] = useState(false)
 
     const token = React.useContext(AuthContext)
-    ///console.log({token})
 
     const loginEvent = async () => {
 
@@ -38,7 +26,6 @@ const Auth: React.FC<AuthType> = (props) => {
         const formData = new FormData()
         formData.append('mail', userName)
         formData.append('password', userPassword)
-        formData.append('confirmPassword', confirmPassword)
 
 
         await fetch('/login', {
