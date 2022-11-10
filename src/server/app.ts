@@ -11,6 +11,9 @@ import { default as bcrypt } from "bcryptjs"
 
 
 
+
+
+
 //@ts-ignore
 import {createDir} from "./services/fileService.ts"
 import fs from "fs";
@@ -34,6 +37,7 @@ const schema = buildSchema(`
     type Book{
         id: ID
         name: String
+        utfname: String
         image: String
     }
     type Folder{
@@ -264,16 +268,16 @@ const root = {
         , [+folderid]).then(res => res.rows)
     ,
 
-    downloadBook: (file: UploadedFile | undefined, userId: string) => {
+    downloadBook: (file: UploadedFile | undefined, userId: string, fileName: string, UTFName: string) => {
         if (file){
-            const filePath = path.join('C:/Users/Admin/Desktop/libnote/public/files', userId)
+            const intendedFilePath = path.join('C:/Users/Admin/Desktop/libnote/public/files', userId)
 
             try {
-                if(fs.existsSync(filePath)) {
-                    file.mv(path.join('C:/Users/Admin/Desktop/libnote/public/files',userId, file.name))
-                    pool.query('INSERT INTO books (userid, name, image) VALUES ($1, $2, $3)', [userId, file.name, ""])
+                if(fs.existsSync(intendedFilePath)) {
+                    file.mv(path.join('C:/Users/Admin/Desktop/libnote/public/files', userId, UTFName))
+                    pool.query('INSERT INTO books (userid, name, image, utfname) VALUES ($1, $2, $3, $4)', [userId, fileName, "", UTFName])
                 } else{
-                    fs.mkdirSync(filePath)
+                    fs.mkdirSync(intendedFilePath)
                     console.log({message: "File already exist"})
                 }
             } catch (e) {
@@ -320,9 +324,14 @@ const root = {
 app.post('/', function(req, res) {
     const file = (req && req.files) && req.files.file as UploadedFile
     const userId = req.body.userId
+    const fileName = req.body.fileName
+    const UTFName = req.body.UTFName
+
+    console.log({fileName, UTFName})
+
     //localStorage.setItem("userId", JSON.stringify(1))
 
-    root.downloadBook(file, userId)
+    root.downloadBook(file, userId, fileName, UTFName)
 })
 
 app.post('/registration',

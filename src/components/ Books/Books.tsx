@@ -8,6 +8,7 @@ import Book from "../Book/Book";
 import html2canvas from "html2canvas"
 //@ts-ignore
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry'
+import CyrillicToTranslit from "cyrillic-to-translit-js"
 
 const pdfjsLib = require("pdfjs-dist/build/pdf")
 const pdfjsViewer = require("pdfjs-dist/web/pdf_viewer")
@@ -28,6 +29,7 @@ const GET_ALL_BOOKS = gql`
         getAllBooks(userid: $userid){
             id
             name
+            utfname
             image
         }
     }
@@ -46,10 +48,14 @@ const SAVE_BASE_64 = gql`
 
 const Books: React.FC<BooksType> = (props) => {
     const navigate = useNavigate()
+    //@ts-ignore
+    const cyrillicToTranslit = new CyrillicToTranslit()
     const [mut] = useMutation(GG)
     //const [refences, setRefences] = useState([])
     const {data, refetch} = useQuery(GET_ALL_BOOKS, {variables:{userid: props.userInfo.id}, pollInterval: 500})
     const [saveBase64] = useMutation(SAVE_BASE_64)
+
+    console.log(data)
 
     const refCanvas = useRef(null)
 
@@ -58,7 +64,7 @@ const Books: React.FC<BooksType> = (props) => {
             console.log(data.getAllBooks)
             data.getAllBooks.map((i: any, index: any) => {
                 if (!i.image) {
-                    let bookUrl = `http://localhost:3000/files/${props.userInfo.id}/${i.name}`
+                    let bookUrl = `http://localhost:3000/files/${props.userInfo.id}/${i.utfname}`
                     setCanvas(refCanvas, bookUrl, i.id)
                 }
             })
@@ -106,10 +112,13 @@ const Books: React.FC<BooksType> = (props) => {
 
     const uploadFile = (file: any) => {
         let formData = new FormData()
-        console.log(file, props.userInfo.id)
+
+        const UTFName = cyrillicToTranslit.transform(file.name, "_")
         formData.append('file', file)
+        formData.append('fileName', file.name)
         formData.append('userId', props.userInfo.id)
-        fetch('/', {
+        formData.append('UTFName', UTFName)
+        fetch('/', { // TODO: updating page!!!!
             method: 'POST',
             body: formData
         })
@@ -121,6 +130,7 @@ const Books: React.FC<BooksType> = (props) => {
         e.preventDefault()
         if(e.dataTransfer){
             if(e.dataTransfer.files[0].type === "application/pdf"){
+                console.log()
                 uploadFile(e.dataTransfer.files[0])
             }else{
                 (dropArea && dropArea.current) && dropArea.current.classList.add('error')
@@ -139,7 +149,7 @@ const Books: React.FC<BooksType> = (props) => {
         <div>
             <Header/>
             <div className="books">
-                {data && data.getAllBooks.map((i:any) => <Book name={i.name} pimp={pimp} imageName={i.image}/>)}
+                {data && data.getAllBooks.map((i:any) => <Book name={i.name} UTFName={i.utfname} pimp={pimp} imageName={i.image} />)}
                 <div id="drop-area"
                      ref={dropArea}
                      onDragEnter={go}
