@@ -15,7 +15,7 @@ const Book: React.FC<BookType> = (props) => {
                 ? <img src={`/files/1/${props.imageName}`} alt="" className="image"/>
                 :  <img src={"/images/non-found-book.png"} alt="" className="image"/>}
 
-            <p className="book-name">{props.name}</p>
+            <p className="book-name">{/*props.name*/}</p>
         </div>
     );
 };
